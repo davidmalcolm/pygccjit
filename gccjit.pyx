@@ -15,9 +15,7 @@
 #   along with this program.  If not, see
 #   <http://www.gnu.org/licenses/>.
 
-#cimport cython
 from libc.stdlib cimport malloc, free
-#cimport stdlib
 cimport gccjit as c_api
 
 cdef int _c_callback(c_api.gcc_jit_context* c_ctxt, object user_data) except -1:
