@@ -10,11 +10,11 @@ def cb(ctxt):
     """
     param_i = ctxt.new_param(None,
                              ctxt.get_int_type(),
-                             'i')
+                             b'i')
     fn = ctxt.new_function(None,
                            gccjit.FUNCTION_EXPORTED,
                            ctxt.get_int_type(),
-                           "square",
+                           b"square",
                            [param_i])
     fn.add_return(None,
                   ctxt.new_binary_op(None,
@@ -30,5 +30,5 @@ for i in range(5):
     if 0:
         ctxt.set_int_option(gccjit.INT_OPTION_OPTIMIZATION_LEVEL, 0)
     result = ctxt.compile()
-    code = result.get_code("square")
+    code = result.get_code(b"square")
     print('code(5) = %s' % code(5))
