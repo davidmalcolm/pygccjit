@@ -112,7 +112,7 @@ class JitTests(unittest.TestCase):
             fn.place_forward_label(label_after_loop)
 
             # return sum
-            fn.add_return (local_sum)
+            fn.add_return(local_sum)
 
         for i in range(5):
             ctxt = gccjit.Context(cb)

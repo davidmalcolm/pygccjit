@@ -94,14 +94,14 @@ cdef class Context:
         for i in range(num_params):
             param = params[i]
             c_params[i] = param._c_param
-        c_function = c_api.gcc_jit_context_new_function (self._c_ctxt,
-                                                         NULL,
-                                                         kind,
-                                                         return_type._c_type,
-                                                         name,
-                                                         len(params),
-                                                         c_params,
-                                                         is_variadic)
+        c_function = c_api.gcc_jit_context_new_function(self._c_ctxt,
+                                                        NULL,
+                                                        kind,
+                                                        return_type._c_type,
+                                                        name,
+                                                        len(params),
+                                                        c_params,
+                                                        is_variadic)
         free(c_params)
 
         f = Function()
@@ -109,10 +109,10 @@ cdef class Context:
         return f
 
     def new_local(self, Type type_, name, loc=None):
-        c_local = c_api.gcc_jit_context_new_local (self._c_ctxt,
-                                                   NULL,
-                                                   type_._c_type,
-                                                   name)
+        c_local = c_api.gcc_jit_context_new_local(self._c_ctxt,
+                                                  NULL,
+                                                  type_._c_type,
+                                                  name)
         if c_local == NULL:
             raise Exception("foo")
         result = Local()
@@ -141,12 +141,12 @@ cdef class Context:
 
     def new_binary_op (self, op, Type result_type, RValue a, RValue b,
                        loc=None):
-        c_rvalue = c_api.gcc_jit_context_new_binary_op (self._c_ctxt,
-                                                        NULL,
-                                                        op,
-                                                        result_type._c_type,
-                                                        a._c_rvalue,
-                                                        b._c_rvalue)
+        c_rvalue = c_api.gcc_jit_context_new_binary_op(self._c_ctxt,
+                                                       NULL,
+                                                       op,
+                                                       result_type._c_type,
+                                                       a._c_rvalue,
+                                                       b._c_rvalue)
         if c_rvalue == NULL:
             raise Exception("foo")
         result = RValue()
@@ -154,7 +154,7 @@ cdef class Context:
         return result
 
     def new_comparison(self, op, RValue a, RValue b, loc=None):
-        c_rvalue = c_api.gcc_jit_context_new_comparison (self._c_ctxt,
+        c_rvalue = c_api.gcc_jit_context_new_comparison(self._c_ctxt,
                                                         NULL,
                                                         op,
                                                         a._c_rvalue,
@@ -174,7 +174,7 @@ cdef class Result:
         self._c_result = c_result
 
     def get_code(self, funcname):
-        cdef void *ptr = c_api.gcc_jit_result_get_code (self._c_result, funcname)
+        cdef void *ptr = c_api.gcc_jit_result_get_code(self._c_result, funcname)
         from ctypes import CFUNCTYPE, c_int
         type_ = CFUNCTYPE(c_int, c_int) # FIXME
         callable_ = type_(<long>ptr)
@@ -263,8 +263,8 @@ cdef class Function:
         return label
 
     def place_forward_label(self, Label label):
-        c_api.gcc_jit_function_place_forward_label (self._c_function,
-                                                    label._c_label)
+        c_api.gcc_jit_function_place_forward_label(self._c_function,
+                                                   label._c_label)
 
     def add_jump(self, Label target, loc=None):
         c_api.gcc_jit_function_add_jump(self._c_function,
@@ -272,9 +272,9 @@ cdef class Function:
                                         target._c_label)
 
     def add_return(self, RValue rvalue, loc=None):
-        c_api.gcc_jit_function_add_return (self._c_function,
-                                           NULL,
-                                           rvalue._c_rvalue)
+        c_api.gcc_jit_function_add_return(self._c_function,
+                                          NULL,
+                                          rvalue._c_rvalue)
 
 FUNCTION_EXPORTED = c_api.GCC_JIT_FUNCTION_EXPORTED
 FUNCTION_INTERNAL = c_api.GCC_JIT_FUNCTION_INTERNAL
