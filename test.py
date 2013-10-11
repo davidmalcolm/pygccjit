@@ -29,17 +29,13 @@ class JitTests(unittest.TestCase):
                  return i * i;
               }
             """
-            param_i = ctxt.new_param(None,
-                                     ctxt.get_int_type(),
+            param_i = ctxt.new_param(ctxt.get_int_type(),
                                      b'i')
-            fn = ctxt.new_function(None,
-                                   gccjit.FUNCTION_EXPORTED,
+            fn = ctxt.new_function(gccjit.FUNCTION_EXPORTED,
                                    ctxt.get_int_type(),
                                    b"square",
                                    [param_i])
-            fn.add_return(None,
-                          ctxt.new_binary_op(None,
-                                             gccjit.BINARY_OP_MULT,
+            fn.add_return(ctxt.new_binary_op(gccjit.BINARY_OP_MULT,
                                              ctxt.get_int_type(),
                                              param_i, param_i))
 

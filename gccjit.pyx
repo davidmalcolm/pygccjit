@@ -70,7 +70,7 @@ cdef class Context:
         r._set_c_ptr(c_result)
         return r
 
-    def new_param(self, loc, Type type_, name):
+    def new_param(self, Type type_, name, loc=None):
         c_result = c_api.gcc_jit_context_new_param(self._c_ctxt,
                                                    NULL,
                                                    type_._c_type,
@@ -81,7 +81,8 @@ cdef class Context:
         p._c_rvalue = c_api.gcc_jit_param_as_rvalue(c_result)
         return p
 
-    def new_function(self, loc, kind, Type return_type, name, params,
+    def new_function(self, kind, Type return_type, name, params,
+                     loc=None,
                      is_variadic=False):
         cdef Param param
         params = list(params)
@@ -107,7 +108,8 @@ cdef class Context:
         f._c_function = c_function
         return f
 
-    def new_binary_op (self, loc, op, Type result_type, RValue a, RValue b):
+    def new_binary_op (self, op, Type result_type, RValue a, RValue b,
+                       loc=None):
         c_rvalue = c_api.gcc_jit_context_new_binary_op (self._c_ctxt,
                                                         NULL,
                                                         op,
@@ -168,7 +170,7 @@ cdef class Param(LValue):
 cdef class Function:
     cdef c_api.gcc_jit_function* _c_function
 
-    def add_return(self, loc, RValue rvalue):
+    def add_return(self, RValue rvalue, loc=None):
         c_api.gcc_jit_function_add_return (self._c_function,
                                            NULL,
                                            rvalue._c_rvalue)
