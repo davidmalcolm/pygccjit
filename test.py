@@ -67,11 +67,11 @@ class JitTests(unittest.TestCase):
             """
             the_type = ctxt.get_int_type()
             return_type = the_type
-            param_n = ctxt.new_param (the_type, "n")
-            fn = ctxt.new_function (gccjit.FUNCTION_EXPORTED,
-                                    return_type,
-                                    "loop_test",
-                                    [param_n])
+            param_n = ctxt.new_param(the_type, "n")
+            fn = ctxt.new_function(gccjit.FUNCTION_EXPORTED,
+                                   return_type,
+                                   "loop_test",
+                                   [param_n])
             # Build locals
             local_i = ctxt.new_local(the_type, "i")
             local_sum = ctxt.new_local(the_type, "sum")
