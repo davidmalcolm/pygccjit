@@ -8,8 +8,7 @@ JIT-compiled functions are wrapped up as `ctypes` callables.
 
 Caveats
 ^^^^^^^
-* These are currently very bare-bones, only wrapping enough of the API to
-  get the demo to work.
+* Most of the API is wrapped, but not all.
 
 * Currently the ctypes hack forces all functions to be of type:
 
