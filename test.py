@@ -50,5 +50,82 @@ class JitTests(unittest.TestCase):
             code = result.get_code(b"square")
             self.assertEqual(code(5), 25)
 
+    def test_sum_of_squares(self):
+        def cb(ctxt):
+            """
+            Create this function:
+              int loop_test (int n)
+              {
+                int i;
+                int sum = 0;
+                for (i = 0; i < n ; i ++)
+                {
+                  sum += i * i;
+                }
+                return sum;
+              }
+            """
+            the_type = ctxt.get_int_type()
+            return_type = the_type
+            param_n = ctxt.new_param (the_type, "n")
+            fn = ctxt.new_function (gccjit.FUNCTION_EXPORTED,
+                                    return_type,
+                                    "loop_test",
+                                    [param_n])
+            # Build locals
+            local_i = ctxt.new_local(the_type, "i")
+            local_sum = ctxt.new_local(the_type, "sum")
+
+            # Create forward label
+            label_after_loop = fn.new_forward_label("after_loop")
+
+            # sum = 0
+            fn.add_assignment(local_sum, ctxt.zero(the_type))
+
+            # i = 0
+            fn.add_assignment(local_i, ctxt.zero(the_type))
+
+            # label "cond:"
+            label_cond = fn.add_label("cond")
+
+            # if (i >= n)
+            fn.add_conditional(ctxt.new_comparison(gccjit.COMPARISON_GE,
+                                                   local_i, param_n),
+                               label_after_loop, None)
+
+            # sum += i * i
+            fn.add_assignment_op(local_sum,
+                                 gccjit.BINARY_OP_PLUS,
+                                 ctxt.new_binary_op(gccjit.BINARY_OP_MULT,
+                                                    the_type,
+                                                    local_i, local_i))
+
+            # i++
+            fn.add_assignment_op(local_i,
+                                 gccjit.BINARY_OP_PLUS,
+                                 ctxt.one(the_type))
+
+            # goto label_cond
+            fn.add_jump(label_cond)
+
+            # label "after_loop:"
+            fn.place_forward_label(label_after_loop)
+
+            # return sum
+            fn.add_return (local_sum)
+
+        for i in range(5):
+            ctxt = gccjit.Context(cb)
+            if 0:
+                ctxt.set_bool_option(gccjit.BOOL_OPTION_DUMP_INITIAL_TREE, True)
+                ctxt.set_bool_option(gccjit.BOOL_OPTION_DUMP_INITIAL_GIMPLE, True)
+                ctxt.set_bool_option(gccjit.BOOL_OPTION_DUMP_EVERYTHING, True)
+                ctxt.set_bool_option(gccjit.BOOL_OPTION_KEEP_INTERMEDIATES, True)
+            if 0:
+                ctxt.set_int_option(gccjit.INT_OPTION_OPTIMIZATION_LEVEL, 3)
+            result = ctxt.compile()
+            code = result.get_code(b"loop_test")
+            self.assertEqual(code(10), 285)
+
 if __name__ == '__main__':
     unittest.main()

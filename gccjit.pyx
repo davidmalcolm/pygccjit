@@ -108,12 +108,55 @@ cdef class Context:
         f._c_function = c_function
         return f
 
+    def new_local(self, Type type_, name, loc=None):
+        c_local = c_api.gcc_jit_context_new_local (self._c_ctxt,
+                                                   NULL,
+                                                   type_._c_type,
+                                                   name)
+        if c_local == NULL:
+            raise Exception("foo")
+        result = Local()
+        result._c_local = c_local
+        result._c_lvalue = c_api.gcc_jit_local_as_lvalue(c_local)
+        result._c_rvalue = c_api.gcc_jit_local_as_rvalue(c_local)
+        return result
+
+    def zero(self, Type type_):
+        c_rvalue = c_api.gcc_jit_context_zero(self._c_ctxt,
+                                              type_._c_type)
+        if c_rvalue == NULL:
+            raise Exception("foo")
+        result = RValue()
+        result._c_rvalue = c_rvalue
+        return result
+
+    def one(self, Type type_):
+        c_rvalue = c_api.gcc_jit_context_one(self._c_ctxt,
+                                             type_._c_type)
+        if c_rvalue == NULL:
+            raise Exception("foo")
+        result = RValue()
+        result._c_rvalue = c_rvalue
+        return result
+
     def new_binary_op (self, op, Type result_type, RValue a, RValue b,
                        loc=None):
         c_rvalue = c_api.gcc_jit_context_new_binary_op (self._c_ctxt,
                                                         NULL,
                                                         op,
                                                         result_type._c_type,
+                                                        a._c_rvalue,
+                                                        b._c_rvalue)
+        if c_rvalue == NULL:
+            raise Exception("foo")
+        result = RValue()
+        result._c_rvalue = c_rvalue
+        return result
+
+    def new_comparison(self, op, RValue a, RValue b, loc=None):
+        c_rvalue = c_api.gcc_jit_context_new_comparison (self._c_ctxt,
+                                                        NULL,
+                                                        op,
                                                         a._c_rvalue,
                                                         b._c_rvalue)
         if c_rvalue == NULL:
@@ -155,6 +198,10 @@ cdef make_type(c_api.gcc_jit_type *c_type):
     t._set_c_ptr(c_type)
     return t
 
+cdef class Label:
+    cdef c_api.gcc_jit_label* _c_label
+    pass
+
 cdef class RValue:
     cdef c_api.gcc_jit_rvalue* _c_rvalue
     pass
@@ -167,8 +214,62 @@ cdef class Param(LValue):
     cdef c_api.gcc_jit_param* _c_param
     pass
 
+cdef class Local(LValue):
+    cdef c_api.gcc_jit_local* _c_local
+    pass
+
 cdef class Function:
     cdef c_api.gcc_jit_function* _c_function
+
+    def new_forward_label(self, name):
+        c_label = c_api.gcc_jit_function_new_forward_label(self._c_function,
+                                                           name)
+        if c_label == NULL:
+            raise Exception("foo")
+        label = Label()
+        label._c_label = c_label
+        return label
+
+    def add_assignment(self, LValue lvalue, RValue rvalue, loc=None):
+        c_api.gcc_jit_function_add_assignment(self._c_function,
+                                              NULL,
+                                              lvalue._c_lvalue,
+                                              rvalue._c_rvalue)
+
+    def add_assignment_op(self, LValue lvalue, op, RValue rvalue, loc=None):
+        c_api.gcc_jit_function_add_assignment_op(self._c_function,
+                                                 NULL,
+                                                 lvalue._c_lvalue,
+                                                 op,
+                                                 rvalue._c_rvalue)
+
+    def add_conditional(self, RValue boolval,
+                        Label on_true, Label on_false,
+                        loc=None):
+        c_api.gcc_jit_function_add_conditional(self._c_function,
+                                               NULL,
+                                               boolval._c_rvalue,
+                                               on_true._c_label,
+                                               on_false._c_label)
+
+    def add_label(self, name, loc=None):
+        c_label = c_api.gcc_jit_function_add_label(self._c_function,
+                                                   NULL,
+                                                   name)
+        if c_label == NULL:
+            raise Exception("foo")
+        label = Label()
+        label._c_label = c_label
+        return label
+
+    def place_forward_label(self, Label label):
+        c_api.gcc_jit_function_place_forward_label (self._c_function,
+                                                    label._c_label)
+
+    def add_jump(self, Label target, loc=None):
+        c_api.gcc_jit_function_add_jump(self._c_function,
+                                        NULL,
+                                        target._c_label)
 
     def add_return(self, RValue rvalue, loc=None):
         c_api.gcc_jit_function_add_return (self._c_function,
@@ -183,6 +284,9 @@ BINARY_OP_PLUS = c_api.GCC_JIT_BINARY_OP_PLUS
 BINARY_OP_MINUS = c_api.GCC_JIT_BINARY_OP_MINUS
 BINARY_OP_MULT = c_api.GCC_JIT_BINARY_OP_MULT
 
+COMPARISON_LT = c_api.GCC_JIT_COMPARISON_LT
+COMPARISON_GE = c_api.GCC_JIT_COMPARISON_GE
+
 STR_OPTION_PROGNAME = c_api.GCC_JIT_STR_OPTION_PROGNAME
 
 INT_OPTION_OPTIMIZATION_LEVEL = c_api.GCC_JIT_INT_OPTION_OPTIMIZATION_LEVEL
@@ -190,3 +294,6 @@ INT_OPTION_OPTIMIZATION_LEVEL = c_api.GCC_JIT_INT_OPTION_OPTIMIZATION_LEVEL
 BOOL_OPTION_DEBUGINFO = c_api.GCC_JIT_BOOL_OPTION_DEBUGINFO
 BOOL_OPTION_DUMP_INITIAL_TREE = c_api.GCC_JIT_BOOL_OPTION_DUMP_INITIAL_TREE
 BOOL_OPTION_DUMP_INITIAL_GIMPLE = c_api.GCC_JIT_BOOL_OPTION_DUMP_INITIAL_GIMPLE
+BOOL_OPTION_DUMP_SUMMARY = c_api.GCC_JIT_BOOL_OPTION_DUMP_SUMMARY
+BOOL_OPTION_DUMP_EVERYTHING = c_api.GCC_JIT_BOOL_OPTION_DUMP_EVERYTHING
+BOOL_OPTION_KEEP_INTERMEDIATES = c_api.GCC_JIT_BOOL_OPTION_KEEP_INTERMEDIATES
