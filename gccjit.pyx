@@ -262,8 +262,9 @@ cdef class Function:
         label._c_label = c_label
         return label
 
-    def place_forward_label(self, Label label):
+    def place_forward_label(self, Label label, loc=None):
         c_api.gcc_jit_function_place_forward_label(self._c_function,
+                                                   NULL,
                                                    label._c_label)
 
     def add_jump(self, Label target, loc=None):

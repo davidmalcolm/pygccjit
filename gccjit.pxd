@@ -164,6 +164,7 @@ cdef extern from "libgccjit.h":
                                                char *name)
 
     void gcc_jit_function_place_forward_label (gcc_jit_function *func,
+                                               gcc_jit_location *loc,
                                                gcc_jit_label *lab)
 
     void gcc_jit_function_add_jump (gcc_jit_function *func,
