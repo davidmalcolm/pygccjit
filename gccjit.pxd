@@ -34,8 +34,6 @@ cdef extern from "libgccjit.h":
         pass
     ctypedef struct gcc_jit_param:
         pass
-    ctypedef struct gcc_jit_local:
-        pass
     ctypedef struct gcc_jit_loop:
         pass
 
@@ -79,15 +77,6 @@ cdef extern from "libgccjit.h":
 
     gcc_jit_label *gcc_jit_function_new_forward_label (gcc_jit_function *func,
                                                        char *name)
-
-    gcc_jit_local *gcc_jit_context_new_local (gcc_jit_context *ctxt,
-                                              gcc_jit_location *loc,
-                                              gcc_jit_type *type,
-                                              char *name)
-
-    gcc_jit_lvalue *gcc_jit_local_as_lvalue (gcc_jit_local *local)
-
-    gcc_jit_rvalue *gcc_jit_local_as_rvalue (gcc_jit_local *local)
 
     gcc_jit_rvalue *gcc_jit_lvalue_as_rvalue (gcc_jit_lvalue *lvalue)
 
@@ -137,6 +126,11 @@ cdef extern from "libgccjit.h":
                                   gcc_jit_location *loc,
                                   gcc_jit_rvalue *ptr,
                                   gcc_jit_rvalue *index)
+
+    gcc_jit_lvalue *gcc_jit_function_new_local (gcc_jit_function *func,
+                                                gcc_jit_location *loc,
+                                                gcc_jit_type *type,
+                                                char *name)
 
     void gcc_jit_function_add_eval (gcc_jit_function *func,
                                     gcc_jit_location *loc,

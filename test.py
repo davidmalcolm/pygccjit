@@ -73,8 +73,8 @@ class JitTests(unittest.TestCase):
                                    "loop_test",
                                    [param_n])
             # Build locals
-            local_i = ctxt.new_local(the_type, "i")
-            local_sum = ctxt.new_local(the_type, "sum")
+            local_i = fn.new_local(the_type, "i")
+            local_sum = fn.new_local(the_type, "sum")
 
             # Create forward label
             label_after_loop = fn.new_forward_label("after_loop")

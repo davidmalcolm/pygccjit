@@ -108,19 +108,6 @@ cdef class Context:
         f._c_function = c_function
         return f
 
-    def new_local(self, Type type_, name, loc=None):
-        c_local = c_api.gcc_jit_context_new_local(self._c_ctxt,
-                                                  NULL,
-                                                  type_._c_type,
-                                                  name)
-        if c_local == NULL:
-            raise Exception("foo")
-        result = Local()
-        result._c_local = c_local
-        result._c_lvalue = c_api.gcc_jit_local_as_lvalue(c_local)
-        result._c_rvalue = c_api.gcc_jit_local_as_rvalue(c_local)
-        return result
-
     def zero(self, Type type_):
         c_rvalue = c_api.gcc_jit_context_zero(self._c_ctxt,
                                               type_._c_type)
@@ -214,12 +201,20 @@ cdef class Param(LValue):
     cdef c_api.gcc_jit_param* _c_param
     pass
 
-cdef class Local(LValue):
-    cdef c_api.gcc_jit_local* _c_local
-    pass
-
 cdef class Function:
     cdef c_api.gcc_jit_function* _c_function
+
+    def new_local(self, Type type_, name, loc=None):
+        c_lvalue = c_api.gcc_jit_function_new_local(self._c_function,
+                                                    NULL,
+                                                    type_._c_type,
+                                                    name)
+        if c_lvalue == NULL:
+            raise Exception("foo")
+        result = LValue()
+        result._c_lvalue = c_lvalue
+        result._c_rvalue = c_api.gcc_jit_lvalue_as_rvalue(c_lvalue)
+        return result
 
     def new_forward_label(self, name):
         c_label = c_api.gcc_jit_function_new_forward_label(self._c_function,
