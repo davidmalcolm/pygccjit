@@ -37,6 +37,27 @@ cdef extern from "libgccjit.h":
     ctypedef struct gcc_jit_loop:
         pass
 
+    cdef enum gcc_jit_types:
+        GCC_JIT_TYPE_VOID,
+        GCC_JIT_TYPE_VOID_PTR,
+        GCC_JIT_TYPE_CHAR,
+        GCC_JIT_TYPE_SIGNED_CHAR,
+        GCC_JIT_TYPE_UNSIGNED_CHAR,
+        GCC_JIT_TYPE_SHORT,
+        GCC_JIT_TYPE_UNSIGNED_SHORT,
+        GCC_JIT_TYPE_INT,
+        GCC_JIT_TYPE_UNSIGNED_INT,
+        GCC_JIT_TYPE_LONG,
+        GCC_JIT_TYPE_UNSIGNED_LONG,
+        GCC_JIT_TYPE_LONG_LONG,
+        GCC_JIT_TYPE_UNSIGNED_LONG_LONG,
+        GCC_JIT_TYPE_FLOAT,
+        GCC_JIT_TYPE_DOUBLE,
+        GCC_JIT_TYPE_LONG_DOUBLE,
+        GCC_JIT_TYPE_CONST_CHAR_PTR,
+        GCC_JIT_TYPE_SIZE_T,
+        GCC_JIT_TYPE_FILE_PTR
+
     ctypedef void (*gcc_jit_code_callback) (gcc_jit_context *ctxt, void *user_data)
 
     gcc_jit_context * gcc_jit_context_acquire ()
@@ -45,11 +66,8 @@ cdef extern from "libgccjit.h":
     void gcc_jit_context_set_code_factory (gcc_jit_context *ctxt,
                                            gcc_jit_code_callback cb, void *user_data)
 
-    gcc_jit_type *gcc_jit_context_get_void_type (gcc_jit_context *ctxt)
-    gcc_jit_type *gcc_jit_context_get_char_type (gcc_jit_context *ctxt)
-    gcc_jit_type *gcc_jit_context_get_int_type (gcc_jit_context *ctxt)
-    gcc_jit_type *gcc_jit_context_get_float_type (gcc_jit_context *ctxt)
-    gcc_jit_type *gcc_jit_context_get_double_type (gcc_jit_context *ctxt)
+    gcc_jit_type *gcc_jit_context_get_type (gcc_jit_context *ctxt,
+                                            gcc_jit_types type_enum)
 
     gcc_jit_type *gcc_jit_type_get_pointer (gcc_jit_type *type)
     gcc_jit_type *gcc_jit_type_get_const (gcc_jit_type *type)

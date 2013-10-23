@@ -50,16 +50,8 @@ cdef class Context:
     def set_int_option(self, opt, val):
         c_api.gcc_jit_context_set_int_option(self._c_ctxt, opt, val)
 
-    def get_void_type(self):
-        return make_type(c_api.gcc_jit_context_get_void_type(self._c_ctxt))
-    def get_char_type(self):
-        return make_type(c_api.gcc_jit_context_get_char_type(self._c_ctxt))
-    def get_int_type(self):
-        return make_type(c_api.gcc_jit_context_get_int_type(self._c_ctxt))
-    def get_float_type(self):
-        return make_type(c_api.gcc_jit_context_get_float_type(self._c_ctxt))
-    def get_double_type(self):
-        return make_type(c_api.gcc_jit_context_get_double_type(self._c_ctxt))
+    def get_type(self, type_enum):
+        return make_type(c_api.gcc_jit_context_get_type(self._c_ctxt, type_enum))
 
     def compile(self):
         cdef c_api.gcc_jit_result *c_result
@@ -293,3 +285,23 @@ BOOL_OPTION_DUMP_INITIAL_GIMPLE = c_api.GCC_JIT_BOOL_OPTION_DUMP_INITIAL_GIMPLE
 BOOL_OPTION_DUMP_SUMMARY = c_api.GCC_JIT_BOOL_OPTION_DUMP_SUMMARY
 BOOL_OPTION_DUMP_EVERYTHING = c_api.GCC_JIT_BOOL_OPTION_DUMP_EVERYTHING
 BOOL_OPTION_KEEP_INTERMEDIATES = c_api.GCC_JIT_BOOL_OPTION_KEEP_INTERMEDIATES
+
+TYPE_VOID = c_api.GCC_JIT_TYPE_VOID
+TYPE_VOID_PTR = c_api.GCC_JIT_TYPE_VOID_PTR
+TYPE_CHAR = c_api.GCC_JIT_TYPE_CHAR
+TYPE_SIGNED_CHAR = c_api.GCC_JIT_TYPE_SIGNED_CHAR
+TYPE_UNSIGNED_CHAR = c_api.GCC_JIT_TYPE_UNSIGNED_CHAR
+TYPE_SHORT = c_api.GCC_JIT_TYPE_SHORT
+TYPE_UNSIGNED_SHORT = c_api.GCC_JIT_TYPE_UNSIGNED_SHORT
+TYPE_INT = c_api.GCC_JIT_TYPE_INT
+TYPE_UNSIGNED_INT = c_api.GCC_JIT_TYPE_UNSIGNED_INT
+TYPE_LONG = c_api.GCC_JIT_TYPE_LONG
+TYPE_UNSIGNED_LONG = c_api.GCC_JIT_TYPE_UNSIGNED_LONG
+TYPE_LONG_LONG = c_api.GCC_JIT_TYPE_LONG_LONG
+TYPE_UNSIGNED_LONG_LONG = c_api.GCC_JIT_TYPE_UNSIGNED_LONG_LONG
+TYPE_FLOAT = c_api.GCC_JIT_TYPE_FLOAT
+TYPE_DOUBLE = c_api.GCC_JIT_TYPE_DOUBLE
+TYPE_LONG_DOUBLE = c_api.GCC_JIT_TYPE_LONG_DOUBLE
+TYPE_CONST_CHAR_PTR = c_api.GCC_JIT_TYPE_CONST_CHAR_PTR
+TYPE_SIZE_T = c_api.GCC_JIT_TYPE_SIZE_T
+TYPE_FILE_PTR = c_api.GCC_JIT_TYPE_FILE_PTR

@@ -29,14 +29,14 @@ class JitTests(unittest.TestCase):
                  return i * i;
               }
             """
-            param_i = ctxt.new_param(ctxt.get_int_type(),
+            param_i = ctxt.new_param(ctxt.get_type(gccjit.TYPE_INT),
                                      b'i')
             fn = ctxt.new_function(gccjit.FUNCTION_EXPORTED,
-                                   ctxt.get_int_type(),
+                                   ctxt.get_type(gccjit.TYPE_INT),
                                    b"square",
                                    [param_i])
             fn.add_return(ctxt.new_binary_op(gccjit.BINARY_OP_MULT,
-                                             ctxt.get_int_type(),
+                                             ctxt.get_type(gccjit.TYPE_INT),
                                              param_i, param_i))
 
         for i in range(5):
@@ -65,19 +65,19 @@ class JitTests(unittest.TestCase):
                 return sum;
               }
             """
-            the_type = ctxt.get_int_type()
+            the_type = ctxt.get_type(gccjit.TYPE_INT)
             return_type = the_type
-            param_n = ctxt.new_param(the_type, "n")
+            param_n = ctxt.new_param(the_type, b"n")
             fn = ctxt.new_function(gccjit.FUNCTION_EXPORTED,
                                    return_type,
-                                   "loop_test",
+                                   b"loop_test",
                                    [param_n])
             # Build locals
-            local_i = fn.new_local(the_type, "i")
-            local_sum = fn.new_local(the_type, "sum")
+            local_i = fn.new_local(the_type, b"i")
+            local_sum = fn.new_local(the_type, b"sum")
 
             # Create forward label
-            label_after_loop = fn.new_forward_label("after_loop")
+            label_after_loop = fn.new_forward_label(b"after_loop")
 
             # sum = 0
             fn.add_assignment(local_sum, ctxt.zero(the_type))
@@ -86,7 +86,7 @@ class JitTests(unittest.TestCase):
             fn.add_assignment(local_i, ctxt.zero(the_type))
 
             # label "cond:"
-            label_cond = fn.add_label("cond")
+            label_cond = fn.add_label(b"cond")
 
             # if (i >= n)
             fn.add_conditional(ctxt.new_comparison(gccjit.COMPARISON_GE,
