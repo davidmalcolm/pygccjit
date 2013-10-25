@@ -91,7 +91,7 @@ class JitTests(unittest.TestCase):
             # if (i >= n)
             fn.add_conditional(ctxt.new_comparison(gccjit.COMPARISON_GE,
                                                    local_i, param_n),
-                               label_after_loop, None)
+                               label_after_loop)
 
             # sum += i * i
             fn.add_assignment_op(local_sum,

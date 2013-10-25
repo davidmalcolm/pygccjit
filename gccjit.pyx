@@ -231,13 +231,14 @@ cdef class Function:
                                                  rvalue._c_rvalue)
 
     def add_conditional(self, RValue boolval,
-                        Label on_true, Label on_false,
+                        Label on_true,
+                        Label on_false=None,
                         loc=None):
         c_api.gcc_jit_function_add_conditional(self._c_function,
                                                NULL,
                                                boolval._c_rvalue,
                                                on_true._c_label,
-                                               on_false._c_label)
+                                               on_false._c_label if on_false else NULL)
 
     def add_label(self, name, loc=None):
         c_label = c_api.gcc_jit_function_add_label(self._c_function,
