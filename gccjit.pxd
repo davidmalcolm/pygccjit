@@ -1,5 +1,6 @@
 #   Copyright 2013 David Malcolm <dmalcolm@redhat.com>
 #   Copyright 2013 Red Hat, Inc.
+#   Copyright 2014 Simon Feltman <s.feltman@gmail.com>
 #
 #   This is free software: you can redistribute it and/or modify it
 #   under the terms of the GNU General Public License as published by
@@ -16,6 +17,12 @@
 #   <http://www.gnu.org/licenses/>.
 
 cdef extern from "libgccjit.h":
+
+    #
+    # Data structures.
+    #
+    ctypedef struct gcc_jit_object:
+        pass
     ctypedef struct gcc_jit_context:
         pass
     ctypedef struct gcc_jit_result:
@@ -26,7 +33,7 @@ cdef extern from "libgccjit.h":
         pass
     ctypedef struct gcc_jit_function:
         pass
-    ctypedef struct gcc_jit_label:
+    ctypedef struct gcc_jit_block:
         pass
     ctypedef struct gcc_jit_rvalue:
         pass
@@ -34,7 +41,9 @@ cdef extern from "libgccjit.h":
         pass
     ctypedef struct gcc_jit_param:
         pass
-    ctypedef struct gcc_jit_loop:
+    ctypedef struct gcc_jit_field:
+        pass
+    ctypedef struct gcc_jit_struct:
         pass
 
     cdef enum gcc_jit_types:
@@ -58,143 +67,9 @@ cdef extern from "libgccjit.h":
         GCC_JIT_TYPE_SIZE_T,
         GCC_JIT_TYPE_FILE_PTR
 
-    ctypedef void (*gcc_jit_code_callback) (gcc_jit_context *ctxt, void *user_data)
-
-    gcc_jit_context * gcc_jit_context_acquire ()
-    void gcc_jit_context_release (gcc_jit_context *ctxt)
-
-    void gcc_jit_context_set_code_factory (gcc_jit_context *ctxt,
-                                           gcc_jit_code_callback cb, void *user_data)
-
-    gcc_jit_type *gcc_jit_context_get_type (gcc_jit_context *ctxt,
-                                            gcc_jit_types type_enum)
-
-    gcc_jit_type *gcc_jit_type_get_pointer (gcc_jit_type *type)
-    gcc_jit_type *gcc_jit_type_get_const (gcc_jit_type *type)
-
-    gcc_jit_param *gcc_jit_context_new_param (gcc_jit_context *ctxt,
-                                              gcc_jit_location *loc,
-                                              gcc_jit_type *type,
-                                              char *name)
-    gcc_jit_lvalue *gcc_jit_param_as_lvalue (gcc_jit_param *param)
-    gcc_jit_rvalue *gcc_jit_param_as_rvalue (gcc_jit_param *param)
-
-    cdef enum gcc_jit_function_kind:
-        GCC_JIT_FUNCTION_EXPORTED,
-        GCC_JIT_FUNCTION_INTERNAL,
-        GCC_JIT_FUNCTION_IMPORTED
-
-    gcc_jit_function *gcc_jit_context_new_function (gcc_jit_context *ctxt,
-                                                    gcc_jit_location *loc,
-                                                    gcc_jit_function_kind kind,
-                                                    gcc_jit_type *return_type,
-                                                    char *name,
-                                                    int num_params,
-                                                    gcc_jit_param **params,
-                                                    int is_variadic)
-
-    gcc_jit_label *gcc_jit_function_new_forward_label (gcc_jit_function *func,
-                                                       char *name)
-
-    gcc_jit_rvalue *gcc_jit_lvalue_as_rvalue (gcc_jit_lvalue *lvalue)
-
-    gcc_jit_rvalue *gcc_jit_context_new_rvalue_from_int (gcc_jit_context *ctxt,
-                                                         gcc_jit_type *type,
-                                                         int value)
-
-    gcc_jit_rvalue *gcc_jit_context_zero (gcc_jit_context *ctxt,
-                      gcc_jit_type *type)
-
-    gcc_jit_rvalue *gcc_jit_context_one (gcc_jit_context *ctxt,
-                     gcc_jit_type *type)
-
-    gcc_jit_rvalue *gcc_jit_context_new_string_literal (gcc_jit_context *ctxt,
-                                                        char *value)
-
-
-    cdef enum gcc_jit_binary_op:
-        GCC_JIT_BINARY_OP_PLUS,
-        GCC_JIT_BINARY_OP_MINUS,
-        GCC_JIT_BINARY_OP_MULT
-
-    gcc_jit_rvalue *gcc_jit_context_new_binary_op (gcc_jit_context *ctxt,
-                                                   gcc_jit_location *loc,
-                                                   gcc_jit_binary_op op,
-                                                   gcc_jit_type *result_type,
-                                                   gcc_jit_rvalue *a,
-                                                   gcc_jit_rvalue *b)
-
-    cdef enum gcc_jit_comparison:
-        GCC_JIT_COMPARISON_LT,
-        GCC_JIT_COMPARISON_GE
-
-    gcc_jit_rvalue *gcc_jit_context_new_comparison (gcc_jit_context *ctxt,
-                                                    gcc_jit_location *loc,
-                                                    gcc_jit_comparison op,
-                                                    gcc_jit_rvalue *a,
-                                                    gcc_jit_rvalue *b)
-
-    gcc_jit_rvalue *gcc_jit_context_new_call (gcc_jit_context *ctxt,
-                                              gcc_jit_location *loc,
-                                              gcc_jit_function *func,
-                                              int numargs ,
-                                              gcc_jit_rvalue **args)
-
-    gcc_jit_rvalue *gcc_jit_context_new_array_lookup (gcc_jit_context *ctxt,
-                                  gcc_jit_location *loc,
-                                  gcc_jit_rvalue *ptr,
-                                  gcc_jit_rvalue *index)
-
-    gcc_jit_lvalue *gcc_jit_function_new_local (gcc_jit_function *func,
-                                                gcc_jit_location *loc,
-                                                gcc_jit_type *type,
-                                                char *name)
-
-    void gcc_jit_function_add_eval (gcc_jit_function *func,
-                                    gcc_jit_location *loc,
-                                    gcc_jit_rvalue *rvalue)
-
-    void gcc_jit_function_add_assignment (gcc_jit_function *func,
-                                          gcc_jit_location *loc,
-                                          gcc_jit_lvalue *lvalue,
-                                          gcc_jit_rvalue *rvalue)
-
-    void gcc_jit_function_add_assignment_op (gcc_jit_function *func,
-                                    gcc_jit_location *loc,
-                                    gcc_jit_lvalue *lvalue,
-                                    gcc_jit_binary_op op,
-                                    gcc_jit_rvalue *rvalue)
-
-    void gcc_jit_function_add_conditional (gcc_jit_function *func,
-                                           gcc_jit_location *loc,
-                                           gcc_jit_rvalue *boolval,
-                                           gcc_jit_label *on_true,
-                                           gcc_jit_label *on_false)
-
-    gcc_jit_label *gcc_jit_function_add_label (gcc_jit_function *func,
-                                               gcc_jit_location *loc,
-                                               char *name)
-
-    void gcc_jit_function_place_forward_label (gcc_jit_function *func,
-                                               gcc_jit_location *loc,
-                                               gcc_jit_label *lab)
-
-    void gcc_jit_function_add_jump (gcc_jit_function *func,
-                                    gcc_jit_location *loc,
-                                    gcc_jit_label *target)
-
-    void gcc_jit_function_add_return (gcc_jit_function *func,
-                                      gcc_jit_location *loc,
-                                      gcc_jit_rvalue *rvalue)
-
-    gcc_jit_loop *gcc_jit_function_new_loop (gcc_jit_function *func,
-                                             gcc_jit_location *loc,
-                                             gcc_jit_rvalue *boolval)
-
-    void gcc_jit_loop_end (gcc_jit_loop *loop,
-                           gcc_jit_location *loc)
-
+    #
     # Option-management
+    #
 
     cdef enum gcc_jit_str_option:
         GCC_JIT_STR_OPTION_PROGNAME
@@ -208,6 +83,7 @@ cdef extern from "libgccjit.h":
         GCC_JIT_BOOL_OPTION_DEBUGINFO
         GCC_JIT_BOOL_OPTION_DUMP_INITIAL_TREE
         GCC_JIT_BOOL_OPTION_DUMP_INITIAL_GIMPLE
+        GCC_JIT_BOOL_OPTION_DUMP_GENERATED_CODE
         GCC_JIT_BOOL_OPTION_DUMP_SUMMARY
         GCC_JIT_BOOL_OPTION_DUMP_EVERYTHING
         GCC_JIT_BOOL_OPTION_SELFCHECK_GC
@@ -226,7 +102,296 @@ cdef extern from "libgccjit.h":
                                           gcc_jit_bool_option opt,
                                           int value)
 
+    #
+    # Context management
+    #
+
+    gcc_jit_context *gcc_jit_context_acquire ()
+    void gcc_jit_context_release (gcc_jit_context *ctxt)
+
     gcc_jit_result *gcc_jit_context_compile (gcc_jit_context *ctxt)
+
+    void gcc_jit_context_dump_to_file (gcc_jit_context *ctxt,
+                                       char *path,
+                                       int update_locations)
+
+    char *gcc_jit_context_get_first_error (gcc_jit_context *ctxt)
+
+
     void *gcc_jit_result_get_code (gcc_jit_result *result, char *funcname)
 
     void gcc_jit_result_release (gcc_jit_result *result)
+
+    gcc_jit_context *gcc_jit_object_get_context (gcc_jit_object *obj)
+
+    char *gcc_jit_object_get_debug_string (gcc_jit_object *obj)
+
+    gcc_jit_location *gcc_jit_context_new_location (gcc_jit_context *ctxt,
+                                                    char *filename,
+                                                    int line,
+                                                    int column)
+
+    gcc_jit_object *gcc_jit_location_as_object (gcc_jit_location *loc)
+
+
+    #
+    # Types
+    #
+
+    gcc_jit_object *gcc_jit_type_as_object (gcc_jit_type *type)
+
+
+    gcc_jit_type *gcc_jit_context_get_type (gcc_jit_context *ctxt,
+                                            gcc_jit_types type_enum)
+
+    gcc_jit_type *gcc_jit_context_get_int_type (gcc_jit_context *ctxt,
+                                                int num_bytes, int is_signed)
+
+    gcc_jit_type *gcc_jit_type_get_pointer (gcc_jit_type *type)
+    gcc_jit_type *gcc_jit_type_get_const (gcc_jit_type *type)
+    gcc_jit_type *gcc_jit_type_get_volatile (gcc_jit_type *type)
+
+    gcc_jit_type *gcc_jit_context_new_array_type (gcc_jit_context *ctxt,
+                                                  gcc_jit_location *loc,
+                                                  gcc_jit_type *element_type,
+                                                  int num_elements)
+
+    gcc_jit_field *gcc_jit_context_new_field (gcc_jit_context *ctxt,
+                                              gcc_jit_location *loc,
+                                              gcc_jit_type *type,
+                                              char *name)
+
+    gcc_jit_object *gcc_jit_field_as_object (gcc_jit_field *field)
+
+    gcc_jit_struct *gcc_jit_context_new_struct_type (gcc_jit_context *ctxt,
+                                                     gcc_jit_location *loc,
+                                                     const char *name,
+                                                     int num_fields,
+                                                     gcc_jit_field **fields)
+
+    gcc_jit_type *gcc_jit_struct_as_type (gcc_jit_struct *struct_type)
+
+    void gcc_jit_struct_set_fields (gcc_jit_struct *struct_type,
+                                    gcc_jit_location *loc,
+                                    int num_fields,
+                                    gcc_jit_field **fields)
+
+    #
+    # Constructing functions.
+    #
+
+    gcc_jit_param *gcc_jit_context_new_param (gcc_jit_context *ctxt,
+                                              gcc_jit_location *loc,
+                                              gcc_jit_type *type,
+                                              char *name)
+    gcc_jit_object *gcc_jit_param_as_object (gcc_jit_param *param)
+    gcc_jit_lvalue *gcc_jit_param_as_lvalue (gcc_jit_param *param)
+    gcc_jit_rvalue *gcc_jit_param_as_rvalue (gcc_jit_param *param)
+
+    cdef enum gcc_jit_function_kind:
+        GCC_JIT_FUNCTION_EXPORTED,
+        GCC_JIT_FUNCTION_INTERNAL,
+        GCC_JIT_FUNCTION_IMPORTED,
+        GCC_JIT_FUNCTION_ALWAYS_INLINE
+
+    gcc_jit_function *gcc_jit_context_new_function (gcc_jit_context *ctxt,
+                                                    gcc_jit_location *loc,
+                                                    gcc_jit_function_kind kind,
+                                                    gcc_jit_type *return_type,
+                                                    char *name,
+                                                    int num_params,
+                                                    gcc_jit_param **params,
+                                                    int is_variadic)
+
+    gcc_jit_function *gcc_jit_context_get_builtin_function (gcc_jit_context *ctxt,
+                                                            char *name)
+
+    gcc_jit_object *gcc_jit_function_as_object (gcc_jit_function *func)
+
+    gcc_jit_param *gcc_jit_function_get_param (gcc_jit_function *func, int index)
+
+    void gcc_jit_function_dump_to_dot (gcc_jit_function *func,
+                                       char *path)
+
+    gcc_jit_block *gcc_jit_function_new_block (gcc_jit_function *func,
+                                               char *name)
+
+    gcc_jit_object *gcc_jit_block_as_object (gcc_jit_block *block)
+
+    gcc_jit_function *gcc_jit_block_get_function (gcc_jit_block *block)
+
+
+    #
+    # lvalues, rvalues and expressions.
+    #
+
+    gcc_jit_lvalue *gcc_jit_context_new_global (gcc_jit_context *ctxt,
+                                                gcc_jit_location *loc,
+                                                gcc_jit_type *type,
+                                                char *name)
+
+    gcc_jit_object *gcc_jit_lvalue_as_object (gcc_jit_lvalue *lvalue)
+
+    gcc_jit_rvalue *gcc_jit_lvalue_as_rvalue (gcc_jit_lvalue *lvalue)
+
+    gcc_jit_object *gcc_jit_rvalue_as_object (gcc_jit_rvalue *rvalue)
+
+    gcc_jit_type *gcc_jit_rvalue_get_type (gcc_jit_rvalue *rvalue)
+
+    gcc_jit_rvalue *gcc_jit_context_new_rvalue_from_int (gcc_jit_context *ctxt,
+                                                         gcc_jit_type *type,
+                                                         int value)
+
+    gcc_jit_rvalue *gcc_jit_context_zero (gcc_jit_context *ctxt,
+                      gcc_jit_type *type)
+
+    gcc_jit_rvalue *gcc_jit_context_one (gcc_jit_context *ctxt,
+                     gcc_jit_type *type)
+
+    gcc_jit_rvalue *gcc_jit_context_new_rvalue_from_double (gcc_jit_context *ctxt,
+                        gcc_jit_type *numeric_type,
+                        double value)
+
+    gcc_jit_rvalue *gcc_jit_context_new_rvalue_from_ptr (gcc_jit_context *ctxt,
+                         gcc_jit_type *pointer_type,
+                         void *value)
+
+    gcc_jit_rvalue *gcc_jit_context_null (gcc_jit_context *ctxt,
+                  gcc_jit_type *pointer_type)
+
+    gcc_jit_rvalue *gcc_jit_context_new_string_literal (gcc_jit_context *ctxt,
+                                                        char *value)
+
+    cdef enum gcc_jit_unary_op:
+        GCC_JIT_UNARY_OP_MINUS,
+        GCC_JIT_UNARY_OP_BITWISE_NEGATE,
+        GCC_JIT_UNARY_OP_LOGICAL_NEGATE
+
+    gcc_jit_rvalue *gcc_jit_context_new_unary_op (gcc_jit_context *ctxt,
+                      gcc_jit_location *loc,
+                      gcc_jit_unary_op op,
+                      gcc_jit_type *result_type,
+                      gcc_jit_rvalue *rvalue)
+
+
+    cdef enum gcc_jit_binary_op:
+        GCC_JIT_BINARY_OP_PLUS,
+        GCC_JIT_BINARY_OP_MINUS,
+        GCC_JIT_BINARY_OP_MULT
+        GCC_JIT_BINARY_OP_DIVIDE,
+        GCC_JIT_BINARY_OP_MODULO,
+        GCC_JIT_BINARY_OP_BITWISE_AND,
+        GCC_JIT_BINARY_OP_BITWISE_XOR,
+        GCC_JIT_BINARY_OP_BITWISE_OR,
+        GCC_JIT_BINARY_OP_LOGICAL_AND,
+        GCC_JIT_BINARY_OP_LOGICAL_OR
+
+    gcc_jit_rvalue *gcc_jit_context_new_binary_op (gcc_jit_context *ctxt,
+                                                   gcc_jit_location *loc,
+                                                   gcc_jit_binary_op op,
+                                                   gcc_jit_type *result_type,
+                                                   gcc_jit_rvalue *a,
+                                                   gcc_jit_rvalue *b)
+
+    cdef enum gcc_jit_comparison:
+        GCC_JIT_COMPARISON_EQ,
+        GCC_JIT_COMPARISON_NE,
+        GCC_JIT_COMPARISON_LT,
+        GCC_JIT_COMPARISON_LE,
+        GCC_JIT_COMPARISON_GT,
+        GCC_JIT_COMPARISON_GE
+
+    gcc_jit_rvalue *gcc_jit_context_new_comparison (gcc_jit_context *ctxt,
+                                                    gcc_jit_location *loc,
+                                                    gcc_jit_comparison op,
+                                                    gcc_jit_rvalue *a,
+                                                    gcc_jit_rvalue *b)
+
+    gcc_jit_rvalue *gcc_jit_context_new_call (gcc_jit_context *ctxt,
+                                              gcc_jit_location *loc,
+                                              gcc_jit_function *func,
+                                              int numargs ,
+                                              gcc_jit_rvalue **args)
+
+    gcc_jit_rvalue *gcc_jit_context_new_cast (gcc_jit_context *ctxt,
+                  gcc_jit_location *loc,
+                  gcc_jit_rvalue *rvalue,
+                  gcc_jit_type *type)
+
+
+    gcc_jit_lvalue *gcc_jit_context_new_array_access (gcc_jit_context *ctxt,
+                                  gcc_jit_location *loc,
+                                  gcc_jit_rvalue *ptr,
+                                  gcc_jit_rvalue *index)
+
+    gcc_jit_lvalue *gcc_jit_lvalue_access_field (gcc_jit_lvalue *struct_,
+                     gcc_jit_location *loc,
+                     gcc_jit_field *field)
+
+    gcc_jit_rvalue *gcc_jit_rvalue_access_field (gcc_jit_rvalue *struct_,
+                     gcc_jit_location *loc,
+                     gcc_jit_field *field)
+
+    gcc_jit_lvalue *gcc_jit_rvalue_dereference_field (gcc_jit_rvalue *ptr,
+                      gcc_jit_location *loc,
+                      gcc_jit_field *field)
+
+    gcc_jit_lvalue *gcc_jit_rvalue_dereference (gcc_jit_rvalue *rvalue,
+                    gcc_jit_location *loc)
+
+    gcc_jit_rvalue *gcc_jit_lvalue_get_address (gcc_jit_lvalue *lvalue,
+                    gcc_jit_location *loc)
+
+    gcc_jit_lvalue *gcc_jit_function_new_local (gcc_jit_function *func,
+                                                gcc_jit_location *loc,
+                                                gcc_jit_type *type,
+                                                char *name)
+
+
+    #
+    # Statement-creation.
+    #
+
+    void gcc_jit_block_add_eval (gcc_jit_block *block,
+                                 gcc_jit_location *loc,
+                                 gcc_jit_rvalue *rvalue)
+
+    void gcc_jit_block_add_assignment (gcc_jit_block *block,
+                                       gcc_jit_location *loc,
+                                       gcc_jit_lvalue *lvalue,
+                                       gcc_jit_rvalue *rvalue)
+
+    void gcc_jit_block_add_assignment_op (gcc_jit_block *block,
+                                          gcc_jit_location *loc,
+                                          gcc_jit_lvalue *lvalue,
+                                          gcc_jit_binary_op op,
+                                          gcc_jit_rvalue *rvalue)
+
+    void gcc_jit_block_add_comment (gcc_jit_block *block,
+                                    gcc_jit_location *loc,
+                                    char *text)
+
+    void gcc_jit_block_end_with_conditional (gcc_jit_block *block,
+                                             gcc_jit_location *loc,
+                                             gcc_jit_rvalue *boolval,
+                                             gcc_jit_block *on_true,
+                                             gcc_jit_block *on_false)
+
+    void gcc_jit_block_end_with_jump (gcc_jit_block *block,
+                                      gcc_jit_location *loc,
+                                      gcc_jit_block *target)
+
+    void gcc_jit_block_end_with_return (gcc_jit_block *block,
+                                        gcc_jit_location *loc,
+                                        gcc_jit_rvalue *rvalue)
+
+    void gcc_jit_block_end_with_void_return (gcc_jit_block *block,
+                                             gcc_jit_location *loc)
+
+    #
+    # Nested contexts.
+    #
+
+    gcc_jit_context *gcc_jit_context_new_child_context (gcc_jit_context *parent_ctxt)
+
+
