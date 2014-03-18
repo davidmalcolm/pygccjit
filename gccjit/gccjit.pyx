@@ -561,12 +561,12 @@ cdef class BinaryOp:
 
 
 cdef class Comparison:
-    EQ = GCC_JIT_COMPARISON_EQ
-    NE = GCC_JIT_COMPARISON_NE
-    LT = GCC_JIT_COMPARISON_LT
-    LE = GCC_JIT_COMPARISON_LE
-    GT = GCC_JIT_COMPARISON_GT
-    GE = GCC_JIT_COMPARISON_GE
+    EQ = c_api.GCC_JIT_COMPARISON_EQ
+    NE = c_api.GCC_JIT_COMPARISON_NE
+    LT = c_api.GCC_JIT_COMPARISON_LT
+    LE = c_api.GCC_JIT_COMPARISON_LE
+    GT = c_api.GCC_JIT_COMPARISON_GT
+    GE = c_api.GCC_JIT_COMPARISON_GE
 
 
 cdef class StrOption:
