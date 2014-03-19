@@ -85,7 +85,13 @@ class JitTests(unittest.TestCase):
             local_i = fn.new_local(the_type, b"i")
             local_sum = fn.new_local(the_type, b"sum")
 
+            # Build blocks
             entry_block = fn.new_block(b'entry')
+            cond_block = fn.new_block(b"cond")
+            loop_block = fn.new_block(b"loop")
+            after_loop_block = fn.new_block(b"after_loop")
+
+            # entry_block: #########################################
 
             # sum = 0
             entry_block.add_assignment(local_sum, ctxt.zero(the_type))
@@ -93,21 +99,17 @@ class JitTests(unittest.TestCase):
             # i = 0
             entry_block.add_assignment(local_i, ctxt.zero(the_type))
 
-            # block "cond:"
-            cond_block = fn.new_block(b"cond")
-
-            # FIXME: a bit strange to add a jump instead of fallthrough?
             entry_block.end_with_jump(cond_block)
 
-            loop_block = fn.new_block(b"loop")
-            after_loop_block = fn.new_block(b"after_loop")
-
+            ### cond_block: ########################################
 
             # while (i < n)
             cond_block.end_with_conditional(ctxt.new_comparison(gccjit.Comparison.LT,
                                                                  local_i, param_n),
                                             loop_block,
                                             after_loop_block)
+
+            ### loop_block: ########################################
 
             # sum += i * i
             loop_block.add_assignment_op(local_sum,
@@ -123,6 +125,8 @@ class JitTests(unittest.TestCase):
 
             # goto cond_block
             loop_block.end_with_jump(cond_block)
+
+            ### after_loop_block: ##################################
 
             # return sum
             after_loop_block.end_with_return(local_sum)
