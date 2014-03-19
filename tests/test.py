@@ -176,10 +176,10 @@ class JitTests(unittest.TestCase):
                                  [param_name])
 
         # static char buffer[1024];
-        buffer = ctxt.new_global(buf_type, b'buffer')
+        buffer = func.new_local(buf_type, b'buffer')
 
         # snprintf(buffer, sizeof(buffer), "hello %s\n", name);
-        args = [ctxt.new_cast(buffer.as_rvalue(), char_p),
+        args = [ctxt.new_cast(buffer.get_address(), char_p),
                 ctxt.new_rvalue_from_int(size_type, 1024),
                 ctxt.new_string_literal(b'hello %s\n'),
                 param_name.as_rvalue()]
@@ -188,17 +188,10 @@ class JitTests(unittest.TestCase):
         block.add_eval(ctxt.new_call(snprintf, args))
         block.end_with_void_return()
 
-        ctxt.set_bool_option(gccjit.BoolOption.DUMP_INITIAL_TREE, True)
-        ctxt.set_bool_option(gccjit.BoolOption.DUMP_INITIAL_GIMPLE, True)
-        ctxt.set_bool_option(gccjit.BoolOption.DUMP_EVERYTHING, True)
-        ctxt.set_bool_option(gccjit.BoolOption.KEEP_INTERMEDIATES, True)
-
-        """ FIXME: Compilation is crashing...
         result = ctxt.compile()
         py_func_type = ctypes.CFUNCTYPE(None, ctypes.c_char_p)
         py_func = py_func_type(result.get_code(b'some_fn'))
         py_func(b'blah')
-        """
 
 
 if __name__ == '__main__':

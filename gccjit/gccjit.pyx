@@ -386,6 +386,12 @@ cdef class LValue(RValue):
         """as_rvalue(self) -> RValue"""
         return RValue_from_c(c_api.gcc_jit_lvalue_as_rvalue(self._c_lvalue))
 
+    def get_address(self, Location loc=None):
+        """get_address(self, loc:Location=None) -> RValue"""
+        return RValue_from_c(c_api.gcc_jit_lvalue_get_address(self._c_lvalue,
+                                                              get_c_location(loc)))
+
+
 cdef LValue LValue_from_c(c_api.gcc_jit_lvalue *c_lvalue):
     if c_lvalue == NULL:
         raise Exception("Unknown error, got bad lvalue")
