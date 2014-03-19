@@ -25,7 +25,7 @@ int_int_func_type = ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_int)
 
 class JitTests(unittest.TestCase):
     def test_square(self):
-        def cb(ctxt):
+        def create_test_fn(ctxt):
             """
             Create this function:
               int square(int i)
@@ -47,7 +47,7 @@ class JitTests(unittest.TestCase):
 
         for i in range(5):
             ctxt = gccjit.Context()
-            cb(ctxt)
+            create_test_fn(ctxt)
 
             if 0:
                 ctxt.set_bool_option(gccjit.BoolOption.DUMP_INITIAL_TREE, True)
@@ -59,7 +59,7 @@ class JitTests(unittest.TestCase):
             self.assertEqual(code(5), 25)
 
     def test_sum_of_squares(self):
-        def cb(ctxt):
+        def create_test_fn(ctxt):
             """
             Create this function:
               int loop_test (int n)
@@ -133,7 +133,7 @@ class JitTests(unittest.TestCase):
 
         for i in range(5):
             ctxt = gccjit.Context()
-            cb(ctxt)
+            create_test_fn(ctxt)
             if 0:
                 ctxt.set_bool_option(gccjit.BoolOption.DUMP_INITIAL_TREE, True)
                 ctxt.set_bool_option(gccjit.BoolOption.DUMP_INITIAL_GIMPLE, True)
