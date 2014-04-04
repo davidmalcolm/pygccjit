@@ -169,6 +169,10 @@ cdef extern from "libgccjit.h":
                                                      int num_fields,
                                                      gcc_jit_field **fields)
 
+    gcc_jit_struct *gcc_jit_context_new_opaque_struct (gcc_jit_context *ctxt,
+                                                       gcc_jit_location *loc,
+                                                       const char *name)
+
     gcc_jit_type *gcc_jit_struct_as_type (gcc_jit_struct *struct_type)
 
     void gcc_jit_struct_set_fields (gcc_jit_struct *struct_type,

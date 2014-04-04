@@ -85,6 +85,8 @@ class JitTests(unittest.TestCase):
             local_i = fn.new_local(the_type, b"i")
             local_sum = fn.new_local(the_type, b"sum")
 
+            self.assertEqual(str(local_i), 'i')
+
             # Build blocks
             entry_block = fn.new_block(b'entry')
             cond_block = fn.new_block(b"cond")
@@ -197,6 +199,11 @@ class JitTests(unittest.TestCase):
         py_func = py_func_type(result.get_code(b'some_fn'))
         py_func(b'blah')
 
+    def test_opaque_struct(self):
+        ctxt = gccjit.Context()
+        foo = ctxt.new_struct(b'foo')
+        foo_ptr = foo.get_pointer()
+        self.assertEqual(str(foo_ptr), 'struct foo *')
 
 if __name__ == '__main__':
     unittest.main()

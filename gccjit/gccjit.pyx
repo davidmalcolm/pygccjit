@@ -73,14 +73,14 @@ cdef class Context:
         cdef c_api.gcc_jit_location *c_loc
         c_loc = c_api.gcc_jit_context_new_location(self._c_ctxt, filename, line, column)
         loc = Location()
-        loc._c_location = c_loc
+        loc._set_c_location(c_loc)
         return loc
 
     def new_global(self, Type type_, name, Location loc=None):
         """new_global(self, type_:Type, name:str, loc:Location=None) -> LValue"""
         c_lvalue = c_api.gcc_jit_context_new_global(self._c_ctxt,
                                                     get_c_location(loc),
-                                                    type_._c_type,
+                                                    type_._get_c_type(),
                                                     name)
         return LValue_from_c(c_lvalue)
 
@@ -88,7 +88,7 @@ cdef class Context:
         """new_array_type(self, element_type:Type, num_elements:int, loc:Location=None) -> Type"""
         c_type = c_api.gcc_jit_context_new_array_type(self._c_ctxt,
                                                       get_c_location(loc),
-                                                      element_type._c_type,
+                                                      element_type._get_c_type(),
                                                       num_elements)
         return Type_from_c(c_type)
 
@@ -96,34 +96,43 @@ cdef class Context:
         """new_field(self, type_:Type, name:str, loc:Location=None) -> Field"""
         c_field = c_api.gcc_jit_context_new_field(self._c_ctxt,
                                                   get_c_location(loc),
-                                                  type_._c_type,
+                                                  type_._get_c_type(),
                                                   name)
         field = Field()
-        field._c_field = c_field
+        field._set_c_field(c_field)
         return field
 
-    def new_struct(self, name, fields, Location loc=None):
+    def new_struct(self, name, fields=None, Location loc=None):
         """new_struct(self, name:str, fields:list, loc:Location=None) -> Struct"""
-        fields = list(fields)
-        cdef int num_fields = len(fields)
-        cdef c_api.gcc_jit_field **c_fields = \
-            <c_api.gcc_jit_field **>malloc(num_fields * sizeof(c_api.gcc_jit_field *))
-
-        if c_fields is NULL:
-            raise MemoryError()
-
+        cdef int num_fields
+        cdef c_api.gcc_jit_field **c_fields = NULL
         cdef Field field
-        for i in range(num_fields):
-            field = fields[i]
-            c_fields[i] = field._c_field
+        cdef c_api.gcc_jit_struct *c_struct
 
-        c_struct = c_api.gcc_jit_context_new_struct_type(self._c_ctxt,
-                                                         get_c_location(loc),
-                                                         name,
-                                                         num_fields,
-                                                         c_fields)
+        if fields is None:
+            c_struct = c_api.gcc_jit_context_new_opaque_struct(self._c_ctxt,
+                                                               get_c_location(loc),
+                                                               name)
+        else:
+            fields = list(fields)
+            num_fields = len(fields)
+            c_fields = \
+              <c_api.gcc_jit_field **>malloc(num_fields * sizeof(c_api.gcc_jit_field *))
+
+            if c_fields is NULL:
+                raise MemoryError()
+
+            for i in range(num_fields):
+                field = fields[i]
+                c_fields[i] = field._get_c_field()
+
+            c_struct = c_api.gcc_jit_context_new_struct_type(self._c_ctxt,
+                                                             get_c_location(loc),
+                                                             name,
+                                                             num_fields,
+                                                             c_fields)
         py_struct = Struct()
-        py_struct._c_struct = c_struct
+        py_struct._set_c_struct(c_struct)
         free(c_fields)
         return py_struct
 
@@ -131,7 +140,7 @@ cdef class Context:
         """new_param(self, type_:Type, name:str, loc:Location=None) -> Param"""
         c_result = c_api.gcc_jit_context_new_param(self._c_ctxt,
                                                    get_c_location(loc),
-                                                   type_._c_type,
+                                                   type_._get_c_type(),
                                                    name)
         return Param_from_c(c_result)
 
@@ -148,11 +157,11 @@ cdef class Context:
             raise MemoryError()
         for i in range(num_params):
             param = params[i]
-            c_params[i] = param._c_param
+            c_params[i] = param._get_c_param()
         c_function = c_api.gcc_jit_context_new_function(self._c_ctxt,
                                                         get_c_location(loc),
                                                         kind,
-                                                        return_type._c_type,
+                                                        return_type._get_c_type(),
                                                         name,
                                                         len(params),
                                                         c_params,
@@ -168,40 +177,40 @@ cdef class Context:
     def zero(self, Type type_):
         """zero(self, type_:Type) -> RValue"""
         c_rvalue = c_api.gcc_jit_context_zero(self._c_ctxt,
-                                              type_._c_type)
+                                              type_._get_c_type())
         return RValue_from_c(c_rvalue)
 
     def one(self, Type type_):
         """one(self, type_:Type) -> RValue"""
         c_rvalue = c_api.gcc_jit_context_one(self._c_ctxt,
-                                             type_._c_type)
+                                             type_._get_c_type())
         return RValue_from_c(c_rvalue)
 
     def new_rvalue_from_double(self, Type numeric_type, double value):
         """new_rvalue_from_double(self, numeric_type:Type, value:float) -> RValue"""
         c_rvalue = c_api.gcc_jit_context_new_rvalue_from_double(self._c_ctxt,
-                                                                numeric_type._c_type,
+                                                                numeric_type._get_c_type(),
                                                                 value)
         return RValue_from_c(c_rvalue)
 
     def new_rvalue_from_int(self, Type type_, int value):
         """new_rvalue_from_int(self, type_:Type, value:int) -> RValue"""
         c_rvalue = c_api.gcc_jit_context_new_rvalue_from_int(self._c_ctxt,
-                                                             type_._c_type,
+                                                             type_._get_c_type(),
                                                              value)
         return RValue_from_c(c_rvalue)
 
     # TODO: cannot use a void pointer here
     #def new_rvalue_from_ptr(self, Type pointer_type, void *value):
     #    c_rvalue = c_api.gcc_jit_context_new_rvalue_from_ptr(self._c_ctxt,
-    #                                                         pointer_type._c_type,
+    #                                                         pointer_type._get_c_type(),
     #                                                         value)
     #    return RValue_from_c(c_rvalue)
 
     def null(self, Type pointer_type):
         """null(self, pointer_type:Type) -> RValue"""
         c_rvalue = c_api.gcc_jit_context_null(self._c_ctxt,
-                                              pointer_type._c_type)
+                                              pointer_type._get_c_type())
         return RValue_from_c(c_rvalue)
 
     def new_string_literal(self, char *value):
@@ -215,8 +224,8 @@ cdef class Context:
         c_rvalue = c_api.gcc_jit_context_new_unary_op (self._c_ctxt,
                                                        get_c_location(loc),
                                                        op,
-                                                       result_type._c_type,
-                                                       rvalue._c_rvalue)
+                                                       result_type._get_c_type(),
+                                                       rvalue._get_c_rvalue())
         return RValue_from_c(c_rvalue)
 
     def new_binary_op(self, op, Type result_type, RValue a, RValue b, Location loc=None):
@@ -224,9 +233,9 @@ cdef class Context:
         c_rvalue = c_api.gcc_jit_context_new_binary_op(self._c_ctxt,
                                                        get_c_location(loc),
                                                        op,
-                                                       result_type._c_type,
-                                                       a._c_rvalue,
-                                                       b._c_rvalue)
+                                                       result_type._get_c_type(),
+                                                       a._get_c_rvalue(),
+                                                       b._get_c_rvalue())
         return RValue_from_c(c_rvalue)
 
     def new_comparison(self, op, RValue a, RValue b, Location loc=None):
@@ -234,8 +243,8 @@ cdef class Context:
         c_rvalue = c_api.gcc_jit_context_new_comparison(self._c_ctxt,
                                                         get_c_location(loc),
                                                         op,
-                                                        a._c_rvalue,
-                                                        b._c_rvalue)
+                                                        a._get_c_rvalue(),
+                                                        b._get_c_rvalue())
 
         return RValue_from_c(c_rvalue)
 
@@ -253,8 +262,8 @@ cdef class Context:
         """new_cast(self, rvalue:RValue, type_:Type, loc:Location=None) -> RValue"""
         c_rvalue = c_api.gcc_jit_context_new_cast(self._c_ctxt,
                                                   get_c_location(loc),
-                                                  rvalue._c_rvalue,
-                                                  type_._c_type)
+                                                  rvalue._get_c_rvalue(),
+                                                  type_._get_c_type())
         return RValue_from_c(c_rvalue)
 
 
@@ -270,11 +279,11 @@ cdef class Context:
         cdef RValue rvalue
         for i in range(num_args):
             rvalue = args[i]
-            c_args[i] = rvalue._c_rvalue
+            c_args[i] = rvalue._get_c_rvalue()
 
         c_rvalue = c_api.gcc_jit_context_new_call(self._c_ctxt,
                                                   get_c_location(loc),
-                                                  func._c_function,
+                                                  func._get_c_function(),
                                                   num_args,
                                                   c_args)
 
@@ -297,7 +306,16 @@ cdef class Result:
 
 cdef class Object:
     cdef c_api.gcc_jit_object *_c_object
-    pass
+
+    def __cinit__(self):
+        self._c_object = NULL
+
+    def __str__(self):
+        if self._c_object:
+            # Require UTF-8 encoding for now
+            return c_api.gcc_jit_object_get_debug_string(self._c_object).decode('utf-8')
+        else:
+            return 'NULL'
 
 cdef Object Object_from_c(c_api.gcc_jit_object *c_object):
     if c_object == NULL:
@@ -308,87 +326,100 @@ cdef Object Object_from_c(c_api.gcc_jit_object *c_object):
     return py_object
 
 
-cdef class Type:
-    cdef c_api.gcc_jit_type *_c_type
-    def __cinit__(self):
-        self._c_type = NULL
+cdef class Type(Object):
+    cdef c_api.gcc_jit_type* _get_c_type(self):
+        return <c_api.gcc_jit_type*>self._c_object
 
-    cdef _set_c_ptr(self, c_api.gcc_jit_type* c_type):
-        self._c_type = c_type
+    cdef _set_c_type(self, c_api.gcc_jit_type* c_type):
+        self._c_object = <c_api.gcc_jit_object *>c_type
 
     def get_pointer(self):
         """get_pointer(self) -> Type"""
-        return Type_from_c(c_api.gcc_jit_type_get_pointer(self._c_type))
+        return Type_from_c(c_api.gcc_jit_type_get_pointer(self._get_c_type()))
 
     def get_const(self):
         """get_const(self) -> Type"""
-        return Type_from_c(c_api.gcc_jit_type_get_const(self._c_type))
+        return Type_from_c(c_api.gcc_jit_type_get_const(self._get_c_type()))
 
     def get_volatile(self):
         """get_volatile(self) -> Type"""
-        return Type_from_c(c_api.gcc_jit_type_get_volatile(self._c_type))
+        return Type_from_c(c_api.gcc_jit_type_get_volatile(self._get_c_type()))
 
     def as_object(self):
         """as_object(self) -> Object"""
-        return Object_from_c(c_api.gcc_jit_type_as_object(self._c_type))
-
+        return Object_from_c(c_api.gcc_jit_type_as_object(self._get_c_type()))
 
 cdef Type_from_c(c_api.gcc_jit_type *c_type):
     t = Type()
-    t._set_c_ptr(c_type)
+    t._set_c_type(c_type)
     return t
 
 
-cdef class Location:
-    cdef c_api.gcc_jit_location* _c_location
-    pass
+cdef class Location(Object):
+    cdef c_api.gcc_jit_location* _get_c_location(self):
+        return <c_api.gcc_jit_location*>self._c_object
 
+    cdef _set_c_location(self, c_api.gcc_jit_location* c_location):
+        self._c_object = <c_api.gcc_jit_object *>c_location
 
 cdef c_api.gcc_jit_location* get_c_location(Location py_location):
     """Get a C location pointer given a Python object, handling None."""
     if py_location is None:
         return NULL
     else:
-        return py_location._c_location
+        return py_location._get_c_location()
 
 
-cdef class Field:
-    cdef c_api.gcc_jit_field* _c_field
-    pass
+cdef class Field(Object):
+    cdef c_api.gcc_jit_field* _get_c_field(self):
+        return <c_api.gcc_jit_field*>self._c_object
+
+    cdef _set_c_field(self, c_api.gcc_jit_field* c_field):
+        self._c_object = <c_api.gcc_jit_object *>c_field
 
 
-cdef class Struct:
-    cdef c_api.gcc_jit_struct* _c_struct
-    pass
+cdef class Struct(Type):
+    cdef c_api.gcc_jit_struct* _get_c_struct(self):
+        return <c_api.gcc_jit_struct*>self._c_object
+
+    cdef _set_c_struct(self, c_api.gcc_jit_struct* c_struct):
+        self._c_object = <c_api.gcc_jit_object *>c_struct
 
 
-cdef class RValue:
-    cdef c_api.gcc_jit_rvalue* _c_rvalue
-    pass
+cdef class RValue(Object):
+    cdef c_api.gcc_jit_rvalue* _get_c_rvalue(self):
+        return <c_api.gcc_jit_rvalue*>self._c_object
+
+    cdef _set_c_rvalue(self, c_api.gcc_jit_rvalue* c_rvalue):
+        self._c_object = <c_api.gcc_jit_object *>c_rvalue
 
 cdef RValue RValue_from_c(c_api.gcc_jit_rvalue *c_rvalue):
     if c_rvalue == NULL:
         raise Exception("Unknown error, got bad rvalue")
 
     py_rvalue = RValue()
-    py_rvalue._c_rvalue = c_rvalue
+    py_rvalue._set_c_rvalue(c_rvalue)
     return py_rvalue
 
 
 cdef class LValue(RValue):
-    cdef c_api.gcc_jit_lvalue* _c_lvalue
+    cdef c_api.gcc_jit_lvalue* _get_c_lvalue(self):
+        return <c_api.gcc_jit_lvalue*>self._c_object
+
+    cdef _set_c_lvalue(self, c_api.gcc_jit_lvalue* c_lvalue):
+        self._c_object = <c_api.gcc_jit_object *>c_lvalue
 
     def as_object(self):
         """as_object(self) -> Object"""
-        return Object_from_c(c_api.gcc_jit_lvalue_as_object(self._c_lvalue))
+        return Object_from_c(c_api.gcc_jit_lvalue_as_object(self._get_c_lvalue()))
 
     def as_rvalue(self):
         """as_rvalue(self) -> RValue"""
-        return RValue_from_c(c_api.gcc_jit_lvalue_as_rvalue(self._c_lvalue))
+        return RValue_from_c(c_api.gcc_jit_lvalue_as_rvalue(self._get_c_lvalue()))
 
     def get_address(self, Location loc=None):
         """get_address(self, loc:Location=None) -> RValue"""
-        return RValue_from_c(c_api.gcc_jit_lvalue_get_address(self._c_lvalue,
+        return RValue_from_c(c_api.gcc_jit_lvalue_get_address(self._get_c_lvalue(),
                                                               get_c_location(loc)))
 
 
@@ -397,108 +428,117 @@ cdef LValue LValue_from_c(c_api.gcc_jit_lvalue *c_lvalue):
         raise Exception("Unknown error, got bad lvalue")
 
     py_lvalue = LValue()
-    py_lvalue._c_lvalue = c_lvalue
-    py_lvalue._c_rvalue = c_api.gcc_jit_lvalue_as_rvalue(c_lvalue)
+    py_lvalue._set_c_lvalue(c_lvalue)
     return py_lvalue
 
 
 cdef class Param(LValue):
-    cdef c_api.gcc_jit_param* _c_param
+    cdef c_api.gcc_jit_param* _get_c_param(self):
+        return <c_api.gcc_jit_param*>self._c_object
+
+    cdef _set_c_param(self, c_api.gcc_jit_param* c_param):
+        self._c_object = <c_api.gcc_jit_object *>c_param
 
     def as_object(self):
         """as_object(self) -> Object"""
-        return Object_from_c(c_api.gcc_jit_param_as_object(self._c_param))
+        return Object_from_c(c_api.gcc_jit_param_as_object(self._get_c_param()))
 
     def as_lvalue(self):
         """as_lvalue(self) -> LValue"""
-        return LValue_from_c(c_api.gcc_jit_param_as_lvalue(self._c_param))
+        return LValue_from_c(c_api.gcc_jit_param_as_lvalue(self._get_c_param()))
 
     def as_rvalue(self):
         """as_rvalue(self) -> RValue"""
-        return RValue_from_c(c_api.gcc_jit_param_as_rvalue(self._c_param))
+        return RValue_from_c(c_api.gcc_jit_param_as_rvalue(self._get_c_param()))
 
 cdef Param Param_from_c(c_api.gcc_jit_param *c_param):
     if c_param == NULL:
         raise Exception("Unknown error, got bad param")
 
     p = Param()
-    p._c_param = c_param
-    p._c_lvalue = c_api.gcc_jit_param_as_lvalue(c_param)
-    p._c_rvalue = c_api.gcc_jit_param_as_rvalue(c_param)
+    p._set_c_param(c_param)
     return p
 
 
-cdef class Function:
-    cdef c_api.gcc_jit_function* _c_function
+cdef class Function(Object):
+    cdef c_api.gcc_jit_function* _get_c_function(self):
+        return <c_api.gcc_jit_function*>self._c_object
+
+    cdef _set_c_function(self, c_api.gcc_jit_function* c_function):
+        self._c_object = <c_api.gcc_jit_object *>c_function
 
     def new_local(self, Type type_, name, Location loc=None):
         """new_local(self, type_:Type, name:str, loc:Location=None) -> LValue"""
-        c_lvalue = c_api.gcc_jit_function_new_local(self._c_function,
+        c_lvalue = c_api.gcc_jit_function_new_local(self._get_c_function(),
                                                     get_c_location(loc),
-                                                    type_._c_type,
+                                                    type_._get_c_type(),
                                                     name)
         return LValue_from_c(c_lvalue)
 
     def new_block(self, name):
         """new_block(self, name:str) -> Block"""
-        c_block = c_api.gcc_jit_function_new_block(self._c_function,
+        c_block = c_api.gcc_jit_function_new_block(self._get_c_function(),
                                                    name)
         if c_block == NULL:
             raise Exception("foo")
         block = Block()
-        block._c_block = c_block
+        block._set_c_block(c_block)
         return block
 
     def as_object(self):
         """as_object(self) -> Object"""
-        c_object = c_api.gcc_jit_function_as_object(self._c_function)
+        c_object = c_api.gcc_jit_function_as_object(self._get_c_function())
         return Object_from_c(c_object)
 
     def get_param(self, index):
         """get_param(self, index:int) -> Param"""
-        c_param = c_api.gcc_jit_function_get_param (self._c_function, index)
+        c_param = c_api.gcc_jit_function_get_param (self._get_c_function(), index)
         return Param_from_c(c_param)
 
     def dump_to_dot(self, char *path):
         """dump_to_dot(self, path:str)"""
-        c_api.gcc_jit_function_dump_to_dot (self._c_function,
+        c_api.gcc_jit_function_dump_to_dot (self._get_c_function(),
                                             path)
 
 cdef Function Function_from_c(c_api.gcc_jit_function *c_function):
     if c_function == NULL:
         raise Exception("Unknown error, got bad function")
     f = Function()
-    f._c_function = c_function
+    f._set_c_function(c_function)
     return f
 
 
-cdef class Block:
-    cdef c_api.gcc_jit_block* _c_block
+cdef class Block(Object):
+    cdef c_api.gcc_jit_block* _get_c_block(self):
+        return <c_api.gcc_jit_block*>self._c_object
+
+    cdef _set_c_block(self, c_api.gcc_jit_block* c_block):
+        self._c_object = <c_api.gcc_jit_object *>c_block
 
     def add_eval(self, RValue rvalue, Location loc=None):
         """add_eval(self, rvalue:RValue, loc:Location=None)"""
-        c_api.gcc_jit_block_add_eval(self._c_block,
+        c_api.gcc_jit_block_add_eval(self._get_c_block(),
                                      get_c_location(loc),
-                                     rvalue._c_rvalue)
+                                     rvalue._get_c_rvalue())
 
     def add_assignment(self, LValue lvalue, RValue rvalue, Location loc=None):
         """add_assignment(self, lvalue:LValue, rvalue:RValue, loc:Location=None)"""
-        c_api.gcc_jit_block_add_assignment(self._c_block,
+        c_api.gcc_jit_block_add_assignment(self._get_c_block(),
                                            get_c_location(loc),
-                                           lvalue._c_lvalue,
-                                           rvalue._c_rvalue)
+                                           lvalue._get_c_lvalue(),
+                                           rvalue._get_c_rvalue())
 
     def add_assignment_op(self, LValue lvalue, op, RValue rvalue, Location loc=None):
         """add_assignment(self, lvalue:LValue, op:BinaryOp, rvalue:RValue, loc:Location=None)"""
-        c_api.gcc_jit_block_add_assignment_op(self._c_block,
+        c_api.gcc_jit_block_add_assignment_op(self._get_c_block(),
                                               get_c_location(loc),
-                                              lvalue._c_lvalue,
+                                              lvalue._get_c_lvalue(),
                                               op,
-                                              rvalue._c_rvalue)
+                                              rvalue._get_c_rvalue())
 
     def add_comment(self, text, Location loc=None):
         """add_comment(self, text:str, loc:Location=None)"""
-        c_api.gcc_jit_block_add_comment (self._c_block,
+        c_api.gcc_jit_block_add_comment (self._get_c_block(),
                                          get_c_location(loc),
                                          text)
 
@@ -507,37 +547,37 @@ cdef class Block:
                              Block on_false=None,
                              Location loc=None):
         """end_with_conditional(self, on_true:Block, on_false:Block=None, loc:Location=None)"""
-        c_api.gcc_jit_block_end_with_conditional(self._c_block,
+        c_api.gcc_jit_block_end_with_conditional(self._get_c_block(),
                                                  get_c_location(loc),
-                                                 boolval._c_rvalue,
-                                                 on_true._c_block,
-                                                 on_false._c_block if on_false else NULL)
+                                                 boolval._get_c_rvalue(),
+                                                 on_true._get_c_block(),
+                                                 on_false._get_c_block() if on_false else NULL)
 
     def end_with_jump(self, Block target, Location loc=None):
         """end_with_jump(self, target:Block, loc:Location=None)"""
-        c_api.gcc_jit_block_end_with_jump(self._c_block,
+        c_api.gcc_jit_block_end_with_jump(self._get_c_block(),
                                           get_c_location(loc),
-                                          target._c_block)
+                                          target._get_c_block())
 
     def end_with_return(self, RValue rvalue, loc=None):
         """end_with_return(self, rvalue:RValue, loc:Location=None)"""
-        c_api.gcc_jit_block_end_with_return(self._c_block,
+        c_api.gcc_jit_block_end_with_return(self._get_c_block(),
                                             get_c_location(loc),
-                                            rvalue._c_rvalue)
+                                            rvalue._get_c_rvalue())
 
     def end_with_void_return(self, loc=None):
         """end_with_void_return(self, loc:Location=None)"""
-        c_api.gcc_jit_block_end_with_void_return(self._c_block,
+        c_api.gcc_jit_block_end_with_void_return(self._get_c_block(),
                                                  get_c_location(loc))
 
     def as_object(self):
         """as_object(self) -> Object"""
-        c_object = c_api.gcc_jit_block_as_object(self._c_block)
+        c_object = c_api.gcc_jit_block_as_object(self._get_c_block())
         return Object_from_c(c_object)
 
     def get_function(self):
         """get_function(self) -> Function"""
-        c_function = c_api.gcc_jit_block_get_function (self._c_block)
+        c_function = c_api.gcc_jit_block_get_function (self._get_c_block())
         return Function_from_c(c_function)
 
 
