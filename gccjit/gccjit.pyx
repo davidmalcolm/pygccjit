@@ -317,6 +317,12 @@ cdef class Object:
         else:
             return 'NULL'
 
+    def __richcmp__(Object self, Object other, int op):
+        if op == 2: # ==
+            return self._c_object == other._c_object
+        elif op == 3: # !=
+            return self._c_object != other._c_object
+
 cdef Object Object_from_c(c_api.gcc_jit_object *c_object):
     if c_object == NULL:
         raise Exception("Unknown error, got bad object")
@@ -392,6 +398,15 @@ cdef class RValue(Object):
 
     cdef _set_c_rvalue(self, c_api.gcc_jit_rvalue* c_rvalue):
         self._c_object = <c_api.gcc_jit_object *>c_rvalue
+
+    def dereference_field(self, Field field, Location loc=None):
+        """dereference_field(self, field:Field, loc:Location=None) -> LValue"""
+        return LValue_from_c(c_api.gcc_jit_rvalue_dereference_field (self._get_c_rvalue(),
+                                                                     get_c_location(loc),
+                                                                     field._get_c_field()))
+
+    def get_type(self):
+        return Type_from_c(c_api.gcc_jit_rvalue_get_type (self._get_c_rvalue()))
 
 cdef RValue RValue_from_c(c_api.gcc_jit_rvalue *c_rvalue):
     if c_rvalue == NULL:

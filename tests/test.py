@@ -191,7 +191,9 @@ class JitTests(unittest.TestCase):
                 param_name.as_rvalue()]
 
         block = func.new_block(b'entry')
-        block.add_eval(ctxt.new_call(snprintf, args))
+        call = ctxt.new_call(snprintf, args)
+        self.assertEqual(call.get_type(), int_type)
+        block.add_eval(call)
         block.end_with_void_return()
 
         result = ctxt.compile()
