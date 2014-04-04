@@ -206,6 +206,8 @@ class JitTests(unittest.TestCase):
         foo = ctxt.new_struct(b'foo')
         foo_ptr = foo.get_pointer()
         self.assertEqual(str(foo_ptr), 'struct foo *')
+        foo.set_fields([ctxt.new_field(foo_ptr, b'prev'),
+                        ctxt.new_field(foo_ptr, b'next')])
 
 if __name__ == '__main__':
     unittest.main()

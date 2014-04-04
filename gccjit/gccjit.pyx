@@ -391,6 +391,27 @@ cdef class Struct(Type):
     cdef _set_c_struct(self, c_api.gcc_jit_struct* c_struct):
         self._c_object = <c_api.gcc_jit_object *>c_struct
 
+    def set_fields(self, fields, Location loc=None):
+        """set_fields(self, fields, loc:Location=None) -> None"""
+        fields = list(fields)
+        num_fields = len(fields)
+        c_fields = \
+          <c_api.gcc_jit_field **>malloc(num_fields * sizeof(c_api.gcc_jit_field *))
+        cdef Field field
+
+        if c_fields is NULL:
+            raise MemoryError()
+
+        for i in range(num_fields):
+            field = fields[i]
+            c_fields[i] = field._get_c_field()
+
+        c_api.gcc_jit_struct_set_fields(self._get_c_struct(),
+                                        get_c_location(loc),
+                                        num_fields,
+                                        c_fields)
+
+        free(c_fields)
 
 cdef class RValue(Object):
     cdef c_api.gcc_jit_rvalue* _get_c_rvalue(self):
