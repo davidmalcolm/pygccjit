@@ -673,6 +673,7 @@ cdef class BoolOption:
 cdef class TypeKind:
     VOID = c_api.GCC_JIT_TYPE_VOID
     VOID_PTR = c_api.GCC_JIT_TYPE_VOID_PTR
+    BOOL = c_api.GCC_JIT_TYPE_BOOL
     CHAR = c_api.GCC_JIT_TYPE_CHAR
     SIGNED_CHAR = c_api.GCC_JIT_TYPE_SIGNED_CHAR
     UNSIGNED_CHAR = c_api.GCC_JIT_TYPE_UNSIGNED_CHAR

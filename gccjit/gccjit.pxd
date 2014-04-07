@@ -49,6 +49,7 @@ cdef extern from "libgccjit.h":
     cdef enum gcc_jit_types:
         GCC_JIT_TYPE_VOID,
         GCC_JIT_TYPE_VOID_PTR,
+        GCC_JIT_TYPE_BOOL,
         GCC_JIT_TYPE_CHAR,
         GCC_JIT_TYPE_SIGNED_CHAR,
         GCC_JIT_TYPE_UNSIGNED_CHAR,
