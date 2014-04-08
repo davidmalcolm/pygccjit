@@ -200,12 +200,11 @@ cdef class Context:
                                                              value)
         return RValue_from_c(c_rvalue)
 
-    # TODO: cannot use a void pointer here
-    #def new_rvalue_from_ptr(self, Type pointer_type, void *value):
-    #    c_rvalue = c_api.gcc_jit_context_new_rvalue_from_ptr(self._c_ctxt,
-    #                                                         pointer_type._get_c_type(),
-    #                                                         value)
-    #    return RValue_from_c(c_rvalue)
+    def new_rvalue_from_ptr(self, Type pointer_type, long value):
+        c_rvalue = c_api.gcc_jit_context_new_rvalue_from_ptr(self._c_ctxt,
+                                                             pointer_type._get_c_type(),
+                                                             <void *>value)
+        return RValue_from_c(c_rvalue)
 
     def null(self, Type pointer_type):
         """null(self, pointer_type:Type) -> RValue"""

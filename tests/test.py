@@ -209,5 +209,15 @@ class JitTests(unittest.TestCase):
         foo.set_fields([ctxt.new_field(foo_ptr, b'prev'),
                         ctxt.new_field(foo_ptr, b'next')])
 
+    def test_rvalue_from_ptr(self):
+        ctxt = gccjit.Context()
+        type_ = ctxt.get_type(gccjit.TypeKind.CONST_CHAR_PTR)
+        null_ptr = ctxt.new_rvalue_from_ptr(type_, 0)
+        self.assertEqual(str(null_ptr), '(const char *)NULL')
+
+        type_ = ctxt.get_type(gccjit.TypeKind.VOID_PTR)
+        nonnull_ptr = ctxt.new_rvalue_from_ptr(type_, id(self))
+        self.assertEqual(str(nonnull_ptr), '(void *)0x%x' % id(self))
+
 if __name__ == '__main__':
     unittest.main()
