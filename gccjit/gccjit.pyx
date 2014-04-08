@@ -66,7 +66,10 @@ cdef class Context:
         c_api.gcc_jit_context_dump_to_file(self._c_ctxt, path, update_locations)
 
     def get_first_error(self):
-        return c_api.gcc_jit_context_get_first_error(self._c_ctxt)
+        cdef char *err = c_api.gcc_jit_context_get_first_error(self._c_ctxt)
+        if err:
+           return err
+        return None
 
     def new_location(self, filename, line, column):
         """new_location(self, filename:str, line:int, column:int) -> Location"""
