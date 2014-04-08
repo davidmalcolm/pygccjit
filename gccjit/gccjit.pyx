@@ -428,6 +428,11 @@ cdef class RValue(Object):
                                                                      get_c_location(loc),
                                                                      field._get_c_field()))
 
+    def dereference(self, loc=None):
+        """dereference(self, loc:Location=None) -> LValue"""
+        return LValue_from_c(c_api.gcc_jit_rvalue_dereference (self._get_c_rvalue(),
+                                                               get_c_location(loc)))
+
     def get_type(self):
         return Type_from_c(c_api.gcc_jit_rvalue_get_type (self._get_c_rvalue()))
 

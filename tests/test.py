@@ -219,5 +219,12 @@ class JitTests(unittest.TestCase):
         nonnull_ptr = ctxt.new_rvalue_from_ptr(type_, id(self))
         self.assertEqual(str(nonnull_ptr), '(void *)0x%x' % id(self))
 
+    def test_dereference(self):
+        ctxt = gccjit.Context()
+        type_ = ctxt.get_type(gccjit.TypeKind.CONST_CHAR_PTR)
+        nonnull_ptr = ctxt.new_rvalue_from_ptr(type_, id(self))
+        self.assertEqual(str(nonnull_ptr.dereference()),
+                         '*(const char *)0x%x' % id(self))
+
 if __name__ == '__main__':
     unittest.main()
