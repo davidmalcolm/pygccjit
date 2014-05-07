@@ -1,0 +1,3 @@
+include COPYING
+recursive-include gccjit *.py *.pyx *.pxd
+recursive-include tests *.py
