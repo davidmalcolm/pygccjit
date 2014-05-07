@@ -16,12 +16,11 @@ setup(
     long_description='gccjit',
     cmdclass = {'build_ext': build_ext},
     ext_modules = [Extension("gccjit._gccjit", ["gccjit/gccjit.pyx"],
-
-                             # FIXME:
-                             include_dirs = ['/home/david/coding/gcc-python/gcc-git-various-branches/src/gcc/jit'],
-                             #FIXME:
-                             library_dirs=["/home/david/coding/gcc-python/gcc-git-various-branches/build/gcc/"],
-                             libraries=["gccjit"])],
+                             libraries=["gccjit"],
+                             # Hacks for ease of hacking on this:
+                             #include_dirs = ['/home/david/coding/gcc-python/gcc-git-jit-clean/src/gcc/jit'],
+                             #library_dirs=["/home/david/coding/gcc-python/gcc-git-jit-clean/build/gcc/"],
+                             )],
     test_suite='tests',
     test_loader='tests:TestLoader',
 )
