@@ -31,7 +31,9 @@ Contents:
    locations.rst
    results.rst
 
-This document described the Python bindings to
+This document describes the
+`Python bindings <https://github.com/davidmalcolm/pygccjit>`_
+to
 `libgccjit <http://gcc.gnu.org/wiki/JIT>`_.
 
 The bindings support both CPython 2 and CPython 3 (using Cython).
