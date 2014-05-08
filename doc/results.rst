@@ -15,36 +15,12 @@
    along with this program.  If not, see
    <http://www.gnu.org/licenses/>.
 
-Python bindings for libgccjit
-=============================
+Compilation results
+===================
 
-Contents:
+.. py:class:: gccjit.Result
 
-.. toctree::
-   :maxdepth: 2
+   .. py:method:: get_code(funcname)
 
-   trivial-example.rst
-   contexts.rst
-   types.rst
-   expressions.rst
-   functions.rst
-   locations.rst
-   results.rst
-
-This document described the Python bindings to
-`libgccjit <http://gcc.gnu.org/wiki/JIT>`_.
-
-The bindings support both CPython 2 and CPython 3 (using Cython).
-
-Note that both libgccjit and the bindings are of "Alpha" quality;
-the APIs are not yet set in stone, and they shouldn't be used in
-production yet.
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+      .. TODO
 
