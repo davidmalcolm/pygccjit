@@ -123,27 +123,53 @@ Compilation contexts
 
        :rtype: :py:class:`gccjit.Function`
 
-    .. py:method:: zero(Type type_)
+    .. py:method:: zero(type_)
+
+       Given a :py:class:`gccjit.Type`, which must be a numeric type,
+       get the constant 0 as a :py:class:`gccjit.RValue` of that type.
 
        :rtype: :py:class:`gccjit.RValue`
 
-    .. py:method:: one(Type type_)
+    .. py:method:: one(type_)
+
+       Given a :py:class:`gccjit.Type`, which must be a numeric type,
+       get the constant 1 as a :py:class:`gccjit.RValue` of that type.
 
        :rtype: :py:class:`gccjit.RValue`
 
-    .. py:method:: new_rvalue_from_double(Type numeric_type, double value)
+    .. py:method:: new_rvalue_from_double(numeric_type, value)
+
+       Given a :py:class:`gccjit.Type`, which must be a numeric type,
+       get a floating-point constant as a :py:class:`gccjit.RValue` of
+       that type.
 
        :rtype: :py:class:`gccjit.RValue`
 
-    .. py:method:: new_rvalue_from_int(Type type_, int value)
+    .. py:method:: new_rvalue_from_int(type_, value)
+
+       Given a :py:class:`gccjit.Type`, which must be a numeric type,
+       get an integer constant as a :py:class:`gccjit.RValue` of
+       that type.
 
        :rtype: :py:class:`gccjit.RValue`
 
-    .. py:method:: new_rvalue_from_ptr(Type pointer_type, long value)
+    .. py:method:: new_rvalue_from_ptr(pointer_type, value)
+
+       Given a :py:class:`gccjit.Type`, which must be a pointer type,
+       and an address, get a :py:class:`gccjit.RValue` representing
+       that address as a pointer of that type::
+
+          ptr = ctxt.new_rvalue_from_ptr(int_star, 0xDEADBEEF)
 
        :rtype: :py:class:`gccjit.RValue`
 
-    .. py:method:: null(Type pointer_type)
+    .. py:method:: null(pointer_type)
+
+       Given a :py:class:`gccjit.Type`, which must be a pointer type,
+       get a :py:class:`gccjit.RValue` representing the `NULL` pointer
+       of that type::
+
+          ptr = ctxt.null(int_star)
 
        :rtype: :py:class:`gccjit.RValue`
 
