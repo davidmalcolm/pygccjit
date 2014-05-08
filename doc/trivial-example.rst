@@ -26,7 +26,7 @@ Consider this C function:
      return i * i;
    }
 
-We can implement this using gccjit as follows:
+We can implement this from Python using gccjit as follows:
 
    .. literalinclude:: ../examples/square.py
     :lines: 27-

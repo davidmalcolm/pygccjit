@@ -26,7 +26,10 @@ Contents:
    trivial-example.rst
    contexts.rst
 
-This document described the Python bindings to libgccjit.
+This document described the Python bindings to
+`libgccjit <http://gcc.gnu.org/wiki/JIT>`_.
+
+The bindings support both CPython 2 and CPython 3 (using Cython).
 
 Note that both libgccjit and the bindings are of "Alpha" quality;
 the APIs are not yet set in stone, and they shouldn't be used in
