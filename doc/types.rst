@@ -25,6 +25,8 @@ Types can be created in several ways:
 
       int_type = ctxt.get_type(gccjit.TypeKind.INT)
 
+  See :py:class:`gccjit.TypeKind` for the available types.
+
 * derived types can be accessed by calling methods on an existing
   type::
 
@@ -37,19 +39,19 @@ Types can be created in several ways:
 
    .. py:method:: get_pointer()
 
-       .. TODO
+       Given type `T` get type `T*`.
 
        :rtype: :py:class:`gccjit.Type`
 
    .. py:method:: get_const()
 
-       .. TODO
+       Given type `T` get type `const T`.
 
        :rtype: :py:class:`gccjit.Type`
 
    .. py:method:: get_volatile()
 
-       .. TODO
+       Given type `T` get type `volatile T`.
 
        :rtype: :py:class:`gccjit.Type`
 
@@ -57,7 +59,7 @@ Structures
 ----------
 
 You can model C `struct` types by creating :py:class:`gccjit.Struct` and
-:py:class:`gcc.Field` instances, in either order:
+:py:class:`gccjit.Field` instances, in either order:
 
 * by creating the fields, then the structure.  For example, to model:
 
@@ -97,6 +99,7 @@ You can model C `struct` types by creating :py:class:`gccjit.Struct` and
 
 .. py:class:: gccjit.Struct
 
-   .. py:method:: set_fields(fields, Location loc=None)
+   .. py:method:: set_fields(fields, loc=None)
 
-      .. TODO
+      Populate the fields of a formerly-opaque struct type.
+      This can only be called once on a given struct type.

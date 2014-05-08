@@ -21,15 +21,24 @@ Functions
 
 .. py:class:: gccjit.Function
 
-   .. py:method:: new_local(Type type_, name, Location loc=None)
+   .. py:method:: new_local(type_, name, loc=None)
 
-      ..
-        """new_local(type_:Type, name:str, loc:Location=None) -> LValue"""
+      Add a new local variable to the function::
+
+        i = fn.new_local(int_type, b'i')
+
+      :rtype: :py:class:`gccjit.LValue`
 
    .. py:method:: new_block(name)
 
-      ..
-        """new_block(name:str) -> Block"""
+      Create a :py:class:`gccjit.Block`.
+
+      The name can be None, or you can give it a meaningful name, which
+      may show up in dumps of the internal representation, and in error
+      messages::
+
+        entry = fn.new_block('entry')
+        on_true = fn.new_block('on_true')
 
    .. py:method:: get_param(index)
 
@@ -38,61 +47,148 @@ Functions
 
    .. py:method:: dump_to_dot(path)
 
-      ..
-        """dump_to_dot(path:str)"""
+      Write a dump in GraphViz format to the given path.
 
 .. py:class:: gccjit.Block
 
-   .. py:method:: add_eval(RValue rvalue, Location loc=None)
+   A `gccjit.Block` is a basic block within a function, i.e.
+   a sequence of statements with a single entry point and a single
+   exit point.
 
-      ..
-        """add_eval(rvalue:RValue, loc:Location=None)"""
+   The first basic block that you create within a function will
+   be the entrypoint.
 
-   .. py:method:: add_assignment(LValue lvalue, RValue rvalue, Location loc=None)
+   Each basic block that you create within a function must be
+   terminated, either with a conditional, a jump, or a return.
 
-      ..
-        """add_assignment(lvalue:LValue, rvalue:RValue, loc:Location=None)"""
+   It's legal to have multiple basic blocks that return within
+   one function.
+
+   .. py:method:: add_eval(rvalue, loc=None)
+
+      Add evaluation of an rvalue, discarding the result
+      (e.g. a function call that "returns" void), for example::
+
+        call = ctxt.new_call(some_fn, args)
+        block.add_eval(call)
+
+      This is equivalent to this C code:
+
+      .. code-block:: c
+
+         (void)expression;
+
+   .. py:method:: add_assignment(lvalue, rvalue, loc=None)
+
+      Add evaluation of an rvalue, assigning the result to the given
+      lvalue, for example::
+
+            # i = 0
+            entry_block.add_assignment(local_i, ctxt.zero(the_type))
+
+      This is roughly equivalent to this C code:
+
+      .. code-block:: c
+
+         lvalue = rvalue;
 
    .. py:method:: add_assignment_op(LValue lvalue, op, RValue rvalue, Location loc=None)
 
-      ..
-        """add_assignment(lvalue:LValue, op:BinaryOp, rvalue:RValue, loc:Location=None)"""
+      Add evaluation of an rvalue, using the result to modify an
+      lvalue.  For example::
+
+        # i++
+        loop_block.add_assignment_op(local_i,
+                                     gccjit.BinaryOp.PLUS,
+                                     ctxt.one(the_type))
+
+      This is analogous to "+=" and friends:
+
+      .. code-block:: c
+
+         lvalue += rvalue;
+         lvalue *= rvalue;
+         lvalue /= rvalue;
+         /* etc */
 
    .. py:method:: add_comment(text, Location loc=None)
 
-      ..
-        """add_comment(text:str, loc:Location=None)"""
+      Add a no-op textual comment to the internal representation of the
+      code.  It will be optimized away, but will be visible in the dumps
+      seen via :py:data:`gccjit.BoolOption.DUMP_INITIAL_TREE`
+      and :py:data:`gccjit.BoolOption.DUMP_INITIAL_GIMPLE`
+      and thus may be of use when debugging how your project's internal
+      representation gets converted to the libgccjit IR.
 
-   .. py:method:: end_with_conditional(RValue boolval, \
-                             Block on_true, \
-                             Block on_false=None, \
-                             Location loc=None)
+   .. py:method:: end_with_conditional(boolval, \
+                                       on_true, \
+                                       on_false=None, \
+                                       loc=None)
 
-      ..
-        """end_with_conditional(on_true:Block, on_false:Block=None, loc:Location=None)"""
+      Terminate a block by adding evaluation of an rvalue, branching on the
+      result to the appropriate successor block.
 
-   .. py:method:: end_with_jump(Block target, Location loc=None)
+      This is roughly equivalent to this C code:
 
-      ..
-        """end_with_jump(target:Block, loc:Location=None)"""
+      .. code-block:: c
+
+        if (boolval)
+          goto on_true;
+        else
+          goto on_false;
+
+      Example::
+
+        # while (i < n)
+        cond_block.end_with_conditional(
+          ctxt.new_comparison(gccjit.Comparison.LT, local_i, param_n),
+          loop_block,
+          after_loop_block)
+
+   .. py:method:: end_with_jump(target, loc=None)
+
+      Terminate a block by adding a jump to the given target block.
+
+      This is roughly equivalent to this C code:
+
+      .. code-block:: c
+
+         goto target;
+
+      Example::
+
+        loop_block.end_with_jump(cond_block)
 
    .. py:method:: end_with_return(RValue rvalue, loc=None)
 
-      ..
-        """end_with_return(rvalue:RValue, loc:Location=None)"""
+      Terminate a block by adding evaluation of an rvalue, returning the
+      value.
+
+      This is roughly equivalent to this C code:
+
+      .. code-block:: c
+
+        return expression;
+
+      Example::
+
+        # return sum
+        after_loop_block.end_with_return(local_sum)
 
    .. py:method:: end_with_void_return(loc=None)
 
-      ..
-        """end_with_void_return(loc:Location=None)"""
+      Terminate a block by adding a valueless return, for use within a function
+      with "void" return type.
+
+      This is equivalent to this C code:
+
+      .. code-block:: c
+
+        return;
 
    .. py:method:: get_function()
 
-      ..
-        """get_function(self) -> Function"""
-        c_function = c_api.gcc_jit_block_get_function (self._get_c_block())
-        return Function_from_c(c_function)
-
+      Get the :py:class:`gccjit.Function` that this block is within.
 
 .. py:class:: gccjit.FunctionKind
 
