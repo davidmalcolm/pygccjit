@@ -6,6 +6,9 @@ GPLv3 or later.
 
 JIT-compiled functions are wrapped up as `ctypes` callables.
 
+Prebuilt HTML documentation can be seen at
+http://pygccjit.readthedocs.org/en/latest/index.html
+
 Caveats
 ^^^^^^^
 * Most of the API is wrapped, but not all.
