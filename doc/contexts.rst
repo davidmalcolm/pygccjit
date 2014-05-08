@@ -97,16 +97,76 @@ Boolean options
      "tree" representation of your code to stderr (before any
      optimizations).
 
+     Here's some sample output (from the `square` example)::
+
+        <statement_list 0x7f4875a62cc0
+           type <void_type 0x7f4875a64bd0 VOID
+               align 8 symtab 0 alias set -1 canonical type 0x7f4875a64bd0
+               pointer_to_this <pointer_type 0x7f4875a64c78>>
+           side-effects head 0x7f4875a761e0 tail 0x7f4875a761f8 stmts 0x7f4875a62d20 0x7f4875a62d00
+
+           stmt <label_expr 0x7f4875a62d20 type <void_type 0x7f4875a64bd0>
+               side-effects
+               arg 0 <label_decl 0x7f4875a79080 entry type <void_type 0x7f4875a64bd0>
+                   VOID file (null) line 0 col 0
+                   align 1 context <function_decl 0x7f4875a77500 square>>>
+           stmt <return_expr 0x7f4875a62d00
+               type <integer_type 0x7f4875a645e8 public SI
+                   size <integer_cst 0x7f4875a623a0 constant 32>
+                   unit size <integer_cst 0x7f4875a623c0 constant 4>
+                   align 32 symtab 0 alias set -1 canonical type 0x7f4875a645e8 precision 32 min <integer_cst 0x7f4875a62340 -2147483648> max <integer_cst 0x7f4875a62360 2147483647>
+                   pointer_to_this <pointer_type 0x7f4875a6b348>>
+               side-effects
+               arg 0 <modify_expr 0x7f4875a72a78 type <integer_type 0x7f4875a645e8>
+                   side-effects arg 0 <result_decl 0x7f4875a7a000 D.54>
+                   arg 1 <mult_expr 0x7f4875a72a50 type <integer_type 0x7f4875a645e8>
+                       arg 0 <parm_decl 0x7f4875a79000 i> arg 1 <parm_decl 0x7f4875a79000 i>>>>>
+
   .. py:data:: DUMP_INITIAL_GIMPLE
 
      If true, :py:meth:`gccjit.Context.compile` will dump the "gimple"
      representation of your code to stderr, before any optimizations
-     are performed.  The dump resembles C code.
+     are performed.  The dump resembles C code::
+
+       square (signed int i)
+       {
+         signed int D.56;
+
+         entry:
+         D.56 = i * i;
+         return D.56;
+       }
 
   .. py:data:: DUMP_GENERATED_CODE
 
      If true, :py:meth:`gccjit.Context.compile` will dump the final
-     generated code to stderr, in the form of assembly language.
+     generated code to stderr, in the form of assembly language::
+
+           .file    "fake.c"
+           .text
+           .globl    square
+           .type    square, @function
+       square:
+       .LFB0:
+           .cfi_startproc
+           pushq    %rbp
+           .cfi_def_cfa_offset 16
+           .cfi_offset 6, -16
+           movq    %rsp, %rbp
+           .cfi_def_cfa_register 6
+           movl    %edi, -4(%rbp)
+       .L2:
+           movl    -4(%rbp), %eax
+           imull    -4(%rbp), %eax
+           popq    %rbp
+           .cfi_def_cfa 7, 8
+           ret
+           .cfi_endproc
+       .LFE0:
+           .size    square, .-square
+           .ident    "GCC: (GNU) 4.9.0 20131023 (Red Hat 0.1-%{gcc_release})"
+           .section    .note.GNU-stack,"",@progbits
+
 
   .. py:data:: DUMP_SUMMARY
 
