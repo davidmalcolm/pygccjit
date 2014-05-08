@@ -137,6 +137,7 @@ Boolean options
 
 Integer options
 ---------------
+.. py:class:: gccjit.IntOption
 
   .. py:data:: OPTIMIZATION_LEVEL
 
