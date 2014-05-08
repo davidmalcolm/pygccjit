@@ -1,4 +1,7 @@
 *~
 gccjit.c
 build
+dist
 doc/_build
+*/__pycache__/*
+*.pyc
