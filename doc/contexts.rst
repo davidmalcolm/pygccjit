@@ -59,6 +59,15 @@ Compilation contexts
        :type opt: :py:class:`gccjit.IntOption`
        :param str val: The new value
 
+    .. py:method:: get_type(type_enum):
+
+       Look up one of the standard types (see :py:class:`gccjit.TypeKind`)::
+
+          int_type = ctxt.get_type(gccjit.TypeKind.INT)
+
+       :param type_enum: Which type to lookup
+       :type type_enum: :py:class:`gccjit.TypeKind`
+
 String options
 --------------
 .. py:class:: gccjit.StrOption
@@ -138,15 +147,74 @@ Integer options
 
      The default value is 0 (unoptimized).
 
+Standard types
+--------------
+
+.. py:class:: gccjit.TypeKind
+
+  .. py:data:: VOID
+
+     C's "void" type.
+
+  .. py:data:: VOID_PTR
+
+     C's "void \*".
+
+  .. py:data:: BOOL
+
+     C++'s bool type; also C99's "_Bool" type, aka "bool" if using
+     stdbool.h.
+
+  .. py:data:: CHAR
+  .. py:data:: SIGNED_CHAR
+  .. py:data:: UNSIGNED_CHAR
+
+     C's "char" (of some signedness) and the variants where the
+     signedness is specified.
+
+  .. py:data:: SHORT
+  .. py:data:: UNSIGNED_SHORT
+
+     C's "short" (signed) and "unsigned short".
+
+  .. py:data:: INT
+  .. py:data:: UNSIGNED_INT
+
+     C's "int" (signed) and "unsigned int"::
+
+          int_type = ctxt.get_type(gccjit.TypeKind.INT)
+
+  .. py:data:: LONG
+  .. py:data:: UNSIGNED_LONG
+
+     C's "long" (signed) and "unsigned long".
+
+  .. py:data:: LONG_LONG
+  .. py:data:: UNSIGNED_LONG_LONG
+
+     C99's "long long" (signed) and "unsigned long long".
+
+  .. py:data:: FLOAT
+  .. py:data:: DOUBLE
+  .. py:data:: LONG_DOUBLE
+
+     Floating-point types
+
+  .. py:data:: CONST_CHAR_PTR
+
+     C type: (const char \*)::
+
+       const_char_p = ctxt.get_type(gccjit.TypeKind.CONST_CHAR_PTR)
+
+  .. py:data:: SIZE_T
+
+    The C "size_t" type.
+
+  .. py:data:: FILE_PTR
+
+    C type: (FILE \*)
+
 ..
-    def get_type(self, type_enum):
-        """get_type(self, type_enum:TypeKind) -> Type"""
-        return Type_from_c(c_api.gcc_jit_context_get_type(self._c_ctxt, type_enum))
-
-    def get_int_type(self, num_bytes, is_signed):
-        """get_int_type(self, num_bytes:int, is_signed:bool) -> Type"""
-        return Type_from_c(c_api.gcc_jit_context_get_int_type(self._c_ctxt, num_bytes, is_signed))
-
     def compile(self):
         """compile(self) -> Result"""
         cdef c_api.gcc_jit_result *c_result
