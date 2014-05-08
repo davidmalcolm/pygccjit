@@ -24,6 +24,7 @@ Contents:
    :maxdepth: 2
 
    trivial-example.rst
+   contexts.rst
 
 This document described the Python bindings to libgccjit.
 
