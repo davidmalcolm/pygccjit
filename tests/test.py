@@ -22,130 +22,17 @@ import gccjit
 
 int_int_func_type = ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_int)
 
-
 class JitTests(unittest.TestCase):
     def test_square(self):
-        def create_test_fn(ctxt):
-            """
-            Create this function:
-              int square(int i)
-              {
-                 return i * i;
-              }
-            """
-            param_i = ctxt.new_param(ctxt.get_type(gccjit.TypeKind.INT),
-                                     b'i')
-            fn = ctxt.new_function(gccjit.FunctionKind.EXPORTED,
-                                   ctxt.get_type(gccjit.TypeKind.INT),
-                                   b"square",
-                                   [param_i])
-
-            block = fn.new_block(b'entry')
-            block.end_with_return(ctxt.new_binary_op(gccjit.BinaryOp.MULT,
-                                                     ctxt.get_type(gccjit.TypeKind.INT),
-                                                     param_i, param_i))
-
+        from examples.square import test_calling_fn
         for i in range(5):
-            ctxt = gccjit.Context()
-            create_test_fn(ctxt)
-
-            if 0:
-                ctxt.set_bool_option(gccjit.BoolOption.DUMP_INITIAL_TREE, True)
-                ctxt.set_bool_option(gccjit.BoolOption.DUMP_INITIAL_GIMPLE, True)
-            if 0:
-                ctxt.set_int_option(gccjit.IntOption.OPTIMIZATION_LEVEL, 0)
-            result = ctxt.compile()
-            code = int_int_func_type(result.get_code(b"square"))
-            self.assertEqual(code(5), 25)
+            self.assertEqual(test_calling_fn(i), i * i)
 
     def test_sum_of_squares(self):
-        def create_test_fn(ctxt):
-            """
-            Create this function:
-              int loop_test (int n)
-              {
-                int i = 0;
-                int sum = 0;
-                while (i < n)
-                {
-                  sum += i * i;
-                  i++;
-                }
-                return sum;
-              }
-            """
-            the_type = ctxt.get_type(gccjit.TypeKind.INT)
-            return_type = the_type
-            param_n = ctxt.new_param(the_type, b"n")
-            fn = ctxt.new_function(gccjit.FunctionKind.EXPORTED,
-                                   return_type,
-                                   b"loop_test",
-                                   [param_n])
-            # Build locals
-            local_i = fn.new_local(the_type, b"i")
-            local_sum = fn.new_local(the_type, b"sum")
-
-            self.assertEqual(str(local_i), 'i')
-
-            # Build blocks
-            entry_block = fn.new_block(b'entry')
-            cond_block = fn.new_block(b"cond")
-            loop_block = fn.new_block(b"loop")
-            after_loop_block = fn.new_block(b"after_loop")
-
-            # entry_block: #########################################
-
-            # sum = 0
-            entry_block.add_assignment(local_sum, ctxt.zero(the_type))
-
-            # i = 0
-            entry_block.add_assignment(local_i, ctxt.zero(the_type))
-
-            entry_block.end_with_jump(cond_block)
-
-            ### cond_block: ########################################
-
-            # while (i < n)
-            cond_block.end_with_conditional(ctxt.new_comparison(gccjit.Comparison.LT,
-                                                                 local_i, param_n),
-                                            loop_block,
-                                            after_loop_block)
-
-            ### loop_block: ########################################
-
-            # sum += i * i
-            loop_block.add_assignment_op(local_sum,
-                                         gccjit.BinaryOp.PLUS,
-                                         ctxt.new_binary_op(gccjit.BinaryOp.MULT,
-                                                            the_type,
-                                                            local_i, local_i))
-
-            # i++
-            loop_block.add_assignment_op(local_i,
-                                         gccjit.BinaryOp.PLUS,
-                                         ctxt.one(the_type))
-
-            # goto cond_block
-            loop_block.end_with_jump(cond_block)
-
-            ### after_loop_block: ##################################
-
-            # return sum
-            after_loop_block.end_with_return(local_sum)
-
+        from examples.sum_of_squares import test_calling_fn
         for i in range(5):
-            ctxt = gccjit.Context()
-            create_test_fn(ctxt)
-            if 0:
-                ctxt.set_bool_option(gccjit.BoolOption.DUMP_INITIAL_TREE, True)
-                ctxt.set_bool_option(gccjit.BoolOption.DUMP_INITIAL_GIMPLE, True)
-                ctxt.set_bool_option(gccjit.BoolOption.DUMP_EVERYTHING, True)
-                ctxt.set_bool_option(gccjit.BoolOption.KEEP_INTERMEDIATES, True)
-            if 0:
-                ctxt.set_int_option(gccjit.IntOption.OPTIMIZATION_LEVEL, 3)
-            result = ctxt.compile()
-            code = int_int_func_type(result.get_code(b"loop_test"))
-            self.assertEqual(code(10), 285)
+            self.assertEqual(test_calling_fn(i),
+                             sum([j * j for j in range(i)]))
 
     def test_imported_function(self):
         """

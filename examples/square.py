@@ -28,8 +28,6 @@ import ctypes
 
 import gccjit
 
-int_int_func_type = ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_int)
-
 def create_fn():
     # Create a compilation context:
     ctxt = gccjit.Context()
@@ -69,7 +67,7 @@ def create_fn():
 
     return jit_result
 
-if __name__ == '__main__':
+def test_calling_fn(i):
     jit_result = create_fn()
 
     # Look up a specific machine code routine within the gccjit.Result,
@@ -78,8 +76,11 @@ if __name__ == '__main__':
 
     # Now use ctypes.CFUNCTYPE to turn it into something we can call
     # from Python:
+    int_int_func_type = ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_int)
     code = int_int_func_type(void_ptr)
 
     # Now try running the code:
-    result = code(5)
-    assert result == 25
+    return code(i)
+
+if __name__ == '__main__':
+    print(test_calling_fn(5))

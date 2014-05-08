@@ -15,39 +15,26 @@
    along with this program.  If not, see
    <http://www.gnu.org/licenses/>.
 
-Python bindings for libgccjit
-=============================
+Loops and other control flow
+----------------------------
+Consider this C function:
 
-Contents:
+ .. code-block:: c
 
-.. toctree::
-   :maxdepth: 2
+  int loop_test (int n)
+  {
+    int i = 0;
+    int sum = 0;
+    while (i < n)
+    {
+      sum += i * i;
+      i++;
+    }
+    return sum;
+  }
 
-   trivial-example.rst
-   loops.rst
-   contexts.rst
-   types.rst
-   expressions.rst
-   functions.rst
-   locations.rst
-   results.rst
+We can implement this from Python using gccjit as follows:
 
-This document describes the
-`Python bindings <https://github.com/davidmalcolm/pygccjit>`_
-to
-`libgccjit <http://gcc.gnu.org/wiki/JIT>`_.
-
-The bindings support both CPython 2 and CPython 3 (using Cython).
-
-Note that both libgccjit and the bindings are of "Alpha" quality;
-the APIs are not yet set in stone, and they shouldn't be used in
-production yet.
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-
+   .. literalinclude:: ../examples/sum_of_squares.py
+    :lines: 34-
+    :language: python
