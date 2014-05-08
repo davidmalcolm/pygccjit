@@ -78,6 +78,18 @@ Compilation contexts
 
     .. py:method:: new_location(filename, line, column)
 
+       Make a :py:class:`gccjit.Location` representing a source location,
+       for use by the debugger::
+
+           loc = ctxt.new_location('web.js', 5, 0)
+
+       .. note::
+
+          You need to enable :py:data:`gccjit.BoolOption.DEBUGINFO` on the
+          context for these locations to actually be usable by the debugger::
+
+            ctxt.set_bool_option(gccjit.BoolOption.DEBUGINFO, True)
+
        :rtype: :py:class:`gccjit.Location`
 
     .. py:method:: new_global(Type type_, name, Location loc=None)

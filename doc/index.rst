@@ -25,6 +25,7 @@ Contents:
 
    trivial-example.rst
    contexts.rst
+   locations.rst
 
 This document described the Python bindings to
 `libgccjit <http://gcc.gnu.org/wiki/JIT>`_.
