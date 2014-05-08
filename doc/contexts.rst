@@ -89,7 +89,7 @@ Boolean options
 
      Note that you can't step through code unless you set up source
      location information for the code (by creating and passing in
-     `gccjit.Location` instances.
+     `gccjit.Location` instances).
 
   .. py:data:: DUMP_INITIAL_TREE
 
