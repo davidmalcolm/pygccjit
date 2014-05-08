@@ -85,7 +85,7 @@ You can model C `struct` types by creating :py:class:`gccjit.Struct` and
 
   like this::
 
-    node = ctxt.new_struct(b'node)
+    node = ctxt.new_struct(b'node')
     node_ptr = node.get_pointer()
     field_hash = ctxt.new_field(int_type, b'm_hash')
     field_next = ctxt.new_field(node_ptr, b'm_next')
