@@ -36,17 +36,19 @@ def create_fn():
     if 0:
         ctxt.set_bool_option(gccjit.BoolOption.DUMP_INITIAL_TREE, True)
         ctxt.set_bool_option(gccjit.BoolOption.DUMP_INITIAL_GIMPLE, True)
+        ctxt.set_bool_option(gccjit.BoolOption.DUMP_GENERATED_CODE, True)
 
     # Adjust this to control optimization level of the generated code:
     if 0:
-        ctxt.set_int_option(gccjit.IntOption.OPTIMIZATION_LEVEL, 0)
+        ctxt.set_int_option(gccjit.IntOption.OPTIMIZATION_LEVEL, 3)
+
+    int_type = ctxt.get_type(gccjit.TypeKind.INT)
 
     # Create parameter "i":
-    param_i = ctxt.new_param(ctxt.get_type(gccjit.TypeKind.INT),
-                             b'i')
+    param_i = ctxt.new_param(int_type, b'i')
     # Create the function:
     fn = ctxt.new_function(gccjit.FunctionKind.EXPORTED,
-                           ctxt.get_type(gccjit.TypeKind.INT),
+                           int_type,
                            b"square",
                            [param_i])
 
@@ -56,7 +58,7 @@ def create_fn():
     # This basic block is relatively simple:
     block.end_with_return(
         ctxt.new_binary_op(gccjit.BinaryOp.MULT,
-                           ctxt.get_type(gccjit.TypeKind.INT),
+                           int_type,
                            param_i, param_i))
 
     # Having populated the context, compile it.
