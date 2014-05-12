@@ -183,18 +183,49 @@ Compilation contexts
        :param bytes value: the bytes of the string literal
        :rtype: :py:class:`gccjit.RValue`
 
-    .. py:method:: new_unary_op(op, Type result_type, RValue rvalue, \
-                               Location loc=None)
+    .. py:method:: new_unary_op(op, result_type, rvalue, loc=None)
 
+       Make a :py:class:`gccjit.RValue` for the given unary operation.
+
+       :param op: Which unary operation
+       :type op: :py:class:`gccjit.UnaryOp`
+       :param result_type: The type of the result
+       :type result_type: :py:class:`gccjit.Type`
+       :param rvalue: The input expression
+       :type rvalue: :py:class:`gccjit.RValue`
+       :param loc: The source location, if any, or None
+       :type loc: :py:class:`gccjit.Location`
        :rtype: :py:class:`gccjit.RValue`
 
-    .. py:method:: new_binary_op(op, Type result_type, RValue a, RValue b, \
-                                Location loc=None)
+    .. py:method:: new_binary_op(op, result_type, a, b, loc=None)
 
+       Make a :py:class:`gccjit.RValue` for the given binary operation.
+
+       :param op: Which binary operation
+       :type op: :py:class:`gccjit.BinaryOp`
+       :param result_type: The type of the result
+       :type result_type: :py:class:`gccjit.Type`
+       :param a: The first input expression
+       :type a: :py:class:`gccjit.RValue`
+       :param b: The second input expression
+       :type b: :py:class:`gccjit.RValue`
+       :param loc: The source location, if any, or None
+       :type loc: :py:class:`gccjit.Location`
        :rtype: :py:class:`gccjit.RValue`
 
-    .. py:method:: new_comparison(op, RValue a, RValue b, Location loc=None)
+    .. py:method:: new_comparison(op, a, b, loc=None)
 
+       Make a :py:class:`gccjit.RValue` of boolean type for the given
+       comparison.
+
+       :param op: Which comparison
+       :type op: :py:class:`gccjit.Comparison`
+       :param a: The first input expression
+       :type a: :py:class:`gccjit.RValue`
+       :param b: The second input expression
+       :type b: :py:class:`gccjit.RValue`
+       :param loc: The source location, if any, or None
+       :type loc: :py:class:`gccjit.Location`
        :rtype: :py:class:`gccjit.RValue`
 
     .. py:method:: new_child_context(self)

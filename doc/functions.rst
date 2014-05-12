@@ -92,10 +92,10 @@ Functions
 
          lvalue = rvalue;
 
-   .. py:method:: add_assignment_op(LValue lvalue, op, RValue rvalue, Location loc=None)
+   .. py:method:: add_assignment_op(lvalue, op, rvalue, loc=None)
 
       Add evaluation of an rvalue, using the result to modify an
-      lvalue.  For example::
+      lvalue via the given :py:data:`gccjit.BinaryOp`.  For example::
 
         # i++
         loop_block.add_assignment_op(local_i,
