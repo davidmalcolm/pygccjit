@@ -633,7 +633,7 @@ cdef class FunctionKind:
 
 cdef class UnaryOp:
     MINUS = c_api.GCC_JIT_UNARY_OP_MINUS
-    NEGATE = c_api.GCC_JIT_UNARY_OP_BITWISE_NEGATE
+    BITWISE_NEGATE = c_api.GCC_JIT_UNARY_OP_BITWISE_NEGATE
     LOGICAL_NEGATE = c_api.GCC_JIT_UNARY_OP_LOGICAL_NEGATE
 
 cdef class BinaryOp:
