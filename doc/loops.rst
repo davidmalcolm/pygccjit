@@ -267,7 +267,8 @@ You can convert this to an image using `dot`:
    $ dot -Tpng /tmp/sum-of-squares.dot -o /tmp/sum-of-squares.png
 
 or use a viewer (my preferred one is xdot.py; see
-https://github.com/jrfonseca/xdot.py):
+https://github.com/jrfonseca/xdot.py; on Fedora you can
+install it with `yum install python-xdot`):
 
     .. figure:: sum-of-squares.png
       :alt: image of a control flow graph
