@@ -184,7 +184,8 @@ We build the comparison using :py:meth:`gccjit.Context.new_comparison`:
 >>> print(guard)
 i < n
 
-and can then use this to add `cond_block`'s sole statement:
+and can then use this to add `cond_block`'s sole statement, via
+:py:meth:`gccjit.Block.end_with_conditional`:
 
 >>> cond_block.end_with_conditional(guard,
 ...                                 loop_block, # on true
