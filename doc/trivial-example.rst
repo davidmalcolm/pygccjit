@@ -26,7 +26,7 @@ Consider this C function:
      return i * i;
    }
 
-How can be construct this from within Python using libgccjit?
+How can we construct this from within Python using libgccjit?
 
 First we need to import the Python bindings to libgccjit:
 
