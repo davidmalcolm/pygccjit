@@ -268,6 +268,13 @@ cdef class Context:
                                                   type_._get_c_type())
         return RValue_from_c(c_rvalue)
 
+    def new_array_access(self, RValue ptr, RValue index, Location loc=None):
+        """new_array_access(self, ptr:RValue, index:RValue, loc:Location=None) -> LValue"""
+        c_lvalue = c_api.gcc_jit_context_new_array_access(self._c_ctxt,
+                                                          get_c_location(loc),
+                                                          ptr._get_c_rvalue(),
+                                                          index._get_c_rvalue())
+        return LValue_from_c(c_lvalue)
 
     def new_call(self, Function func, args, Location loc=None):
         """new_call(self, func:Function, args:list of RValue, loc:Location=None) -> RValue"""

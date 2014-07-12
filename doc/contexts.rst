@@ -236,6 +236,16 @@ Compilation contexts
 
        :rtype: :py:class:`gccjit.RValue`
 
+    .. py:method:: new_array_access(ptr, index, loc=None)
+
+       :param ptr: The pointer or array
+       :type ptr: :py:class:`gccjit.RValue`
+       :param index: The index within the array
+       :type index: :py:class:`gccjit.RValue`
+       :param loc: The source location, if any, or None
+       :type loc: :py:class:`gccjit.Location`
+       :rtype: :py:class:`gccjit.LValue`
+
     .. py:method:: new_call(Function func, args, Location loc=None)
 
        :rtype: :py:class:`gccjit.RValue`
