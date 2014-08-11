@@ -27,6 +27,11 @@ Types can be created in several ways:
 
   See :py:class:`gccjit.TypeKind` for the available types.
 
+  You can `int` types of specific sizes (in bytes) using
+  :py:meth:`gccjit.Context.get_int_type`::
+
+      int_type = ctxt.get_int_type(4, is_signed=True)
+
 * derived types can be accessed by calling methods on an existing
   type::
 

@@ -68,6 +68,12 @@ Compilation contexts
        :param type_enum: Which type to lookup
        :type type_enum: :py:class:`gccjit.TypeKind`
 
+    .. py:method:: get_int_type(num_bytes, is_signed)
+
+       Look up an integet type of the given size::
+
+          int_type = ctxt.get_int_type(4, is_signed=True)
+
     .. py:method:: compile()
 
        :rtype: :py:class:`gccjit.Result`
