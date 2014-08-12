@@ -115,6 +115,66 @@ Compilation contexts
 
        :rtype: :py:class:`gccjit.Struct`
 
+    .. py:method:: new_union(name, fields=None, Location loc=None)
+
+       Construct a new "union" type.
+
+       :rtype: :py:class:`gccjit.Type`
+       :param field: The fields that make up the union
+       :type fields: A sequence of :py:class:`gccjit.Field`
+       :param loc: The source location, if any, or None
+       :type loc: :py:class:`gccjit.Location`
+
+       For example, to create the equivalent of:
+
+       .. code-block:: c
+
+         union u
+         {
+           int as_int;
+           float as_float;
+         };
+
+       you can use::
+
+         ctxt = gccjit.Context()
+         int_type = ctxt.get_type(gccjit.TypeKind.INT)
+         float_type = ctxt.get_type(gccjit.TypeKind.FLOAT)
+         as_int = ctxt.new_field(int_type, b'as_int')
+         as_float = ctxt.new_field(float_type, b'as_float')
+         u = ctxt.new_union(b'u', [as_int, as_float])
+
+    .. py:method:: new_function_ptr_type(return_type, param_types, loc=None, is_variadic=False)
+
+       :param return_type:  The return type of the function
+       :type return_type: :py:class:`gccjit.Type`
+       :param param_types: The types of the parameters
+       :type param_types: A sequence of :py:class:`gccjit.Type`
+       :param loc: The source location, if any, or None
+       :type loc: :py:class:`gccjit.Location`
+       :param is_variadic: Is the function variadic (i.e. accepts a
+                           variable number of arguments)
+       :type is_variadic: :py:class:`bool`
+       :rtype: :py:class:`gccjit.Type`
+
+       For example, to create the equivalent of:
+
+       .. code-block:: c
+
+          typedef void (*fn_ptr_type) (int, int int);
+
+       you can use::
+
+         >>> ctxt = gccjit.Context()
+         >>> void_type = ctxt.get_type(gccjit.TypeKind.VOID)
+         >>> int_type = ctxt.get_type(gccjit.TypeKind.INT)
+         >>> fn_ptr_type = ctxt.new_function_ptr_type (void_type,
+                                                       [int_type,
+                                                        int_type,
+                                                        int_type])
+         >>> print(fn_ptr_type)
+         void (*) (int, int, int)
+
     .. py:method:: new_param(Type type_, name, Location loc=None)
 
        :rtype: :py:class:`gccjit.Param`
@@ -255,6 +315,29 @@ Compilation contexts
     .. py:method:: new_call(Function func, args, Location loc=None)
 
        :rtype: :py:class:`gccjit.RValue`
+
+    .. py:method:: new_call_through_ptr(fn_ptr, args, loc=None)
+
+       :param fn_ptr: A function pointer
+       :type fn_ptr: :py:class:`gccjit.RValue`
+       :param args: The arguments to the function call
+       :type args: A sequence of :py:class:`gccjit.RValue`
+       :param loc: The source location, if any, or None
+       :type loc: :py:class:`gccjit.Location`
+       :rtype: :py:class:`gccjit.RValue`
+
+       For example, to create the equivalent of:
+
+       .. code-block:: c
+
+          typedef void (*fn_ptr_type) (int, int, int);
+          fn_ptr_type fn_ptr;
+
+          fn_ptr (a, b, c);
+
+       you can use::
+
+         block.add_eval (ctxt.new_call_through_ptr(fn_ptr, [a, b, c]))
 
 String options
 --------------

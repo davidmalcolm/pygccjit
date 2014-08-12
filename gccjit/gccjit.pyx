@@ -139,6 +139,65 @@ cdef class Context:
         free(c_fields)
         return py_struct
 
+    def new_union(self, name, fields=None, Location loc=None):
+        """new_union(self, name:str, fields:list, loc:Location=None) -> Type"""
+        cdef int num_fields
+        cdef c_api.gcc_jit_field **c_fields = NULL
+        cdef Field field
+        cdef c_api.gcc_jit_type *c_type
+
+        fields = list(fields)
+        num_fields = len(fields)
+        c_fields = \
+          <c_api.gcc_jit_field **>malloc(num_fields * sizeof(c_api.gcc_jit_field *))
+
+        if c_fields is NULL:
+            raise MemoryError()
+
+        for i in range(num_fields):
+            field = fields[i]
+            c_fields[i] = field._get_c_field()
+
+        c_type = c_api.gcc_jit_context_new_union_type(self._c_ctxt,
+                                                      get_c_location(loc),
+                                                      name,
+                                                      num_fields,
+                                                      c_fields)
+        py_type = Type()
+        py_type._set_c_type(c_type)
+        free(c_fields)
+        return py_type
+
+    def new_function_ptr_type(self, Type return_type, param_types, Location loc=None, is_variadic=False):
+        """new_function_ptr_type(self, return_type:Type, param_types:list, loc:Location=None, is_variadic=False) -> Type"""
+        cdef int num_params
+        cdef c_api.gcc_jit_type **c_param_types = NULL
+        cdef Type type_
+        cdef c_api.gcc_jit_type *c_fn_ptr_type
+
+        param_types = list(param_types)
+        num_params = len(param_types)
+        c_param_types = \
+                   <c_api.gcc_jit_type **>malloc(num_params * sizeof(c_api.gcc_jit_type *))
+
+        if c_param_types is NULL:
+            raise MemoryError()
+
+        for i in range(num_params):
+            type_ = param_types[i]
+            c_param_types[i] = type_._get_c_type()
+
+        c_fn_ptr_type = c_api.gcc_jit_context_new_function_ptr_type (self._c_ctxt,
+                                                                     get_c_location(loc),
+                                                                     return_type._get_c_type(),
+                                                                     num_params,
+                                                                     c_param_types,
+                                                                     is_variadic)
+        py_type = Type()
+        py_type._set_c_type(c_fn_ptr_type)
+        free(c_param_types)
+        return py_type
+
     def new_param(self, Type type_, name, Location loc=None):
         """new_param(self, type_:Type, name:str, loc:Location=None) -> Param"""
         c_result = c_api.gcc_jit_context_new_param(self._c_ctxt,
@@ -299,6 +358,28 @@ cdef class Context:
         free(c_args)
         return RValue_from_c(c_rvalue)
 
+    def new_call_through_ptr(self, RValue fn_ptr, args, Location loc=None):
+        """new_call(self, fn_ptr:RValue, args:list of RValue, loc:Location=None) -> RValue"""
+        args = list(args)
+        cdef int num_args = len(args)
+        cdef c_api.gcc_jit_rvalue **c_args = \
+            <c_api.gcc_jit_rvalue **>malloc(num_args * sizeof(c_api.gcc_jit_rvalue *))
+        if c_args is NULL:
+            raise MemoryError()
+
+        cdef RValue rvalue
+        for i in range(num_args):
+            rvalue = args[i]
+            c_args[i] = rvalue._get_c_rvalue()
+
+        c_rvalue = c_api.gcc_jit_context_new_call_through_ptr(self._c_ctxt,
+                                                              get_c_location(loc),
+                                                              fn_ptr._get_c_rvalue(),
+                                                              num_args,
+                                                              c_args)
+
+        free(c_args)
+        return RValue_from_c(c_rvalue)
 
 cdef class Result:
     cdef c_api.gcc_jit_result* _c_result

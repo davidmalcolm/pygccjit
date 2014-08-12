@@ -181,6 +181,19 @@ cdef extern from "libgccjit.h":
                                     int num_fields,
                                     gcc_jit_field **fields)
 
+
+    gcc_jit_type *gcc_jit_context_new_union_type (gcc_jit_context *ctxt,
+                                                  gcc_jit_location *loc,
+                                                  const char *name,
+                                                  int num_fields,
+                                                  gcc_jit_field **fields)
+
+    gcc_jit_type *gcc_jit_context_new_function_ptr_type (gcc_jit_context *ctxt,
+                                                         gcc_jit_location *loc,
+                                                         gcc_jit_type *return_type,
+                                                         int num_params,
+                                                         gcc_jit_type **param_types,
+                                                         int is_variadic)
     #
     # Constructing functions.
     #
@@ -317,6 +330,12 @@ cdef extern from "libgccjit.h":
                                               gcc_jit_function *func,
                                               int numargs ,
                                               gcc_jit_rvalue **args)
+
+    gcc_jit_rvalue *gcc_jit_context_new_call_through_ptr (gcc_jit_context *ctxt,
+                                                          gcc_jit_location *loc,
+                                                          gcc_jit_rvalue *fn_ptr,
+                                                          int numargs,
+                                                          gcc_jit_rvalue **args)
 
     gcc_jit_rvalue *gcc_jit_context_new_cast (gcc_jit_context *ctxt,
                   gcc_jit_location *loc,

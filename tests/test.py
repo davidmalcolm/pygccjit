@@ -113,5 +113,32 @@ class JitTests(unittest.TestCase):
         self.assertEqual(str(nonnull_ptr.dereference()),
                          '*(const char *)0x%x' % id(self))
 
+    def test_call_through_function_ptr(self):
+        ctxt = gccjit.Context()
+        void_type = ctxt.get_type(gccjit.TypeKind.VOID)
+        int_type = ctxt.get_type(gccjit.TypeKind.INT)
+        fn_ptr_type = ctxt.new_function_ptr_type (void_type,
+                                                  [int_type,
+                                                   int_type,
+                                                   int_type])
+        self.assertEqual(str(fn_ptr_type),
+                         'void (*) (int, int, int)')
+        fn_ptr = ctxt.new_param(fn_ptr_type, "fn")
+        a = ctxt.new_param(int_type, "a")
+        b = ctxt.new_param(int_type, "b")
+        c = ctxt.new_param(int_type, "c")
+        call = ctxt.new_call_through_ptr(fn_ptr, [a, b, c])
+        self.assertEqual(str(call),
+                         'fn (a, b, c)')
+
+    def test_union(self):
+        ctxt = gccjit.Context()
+        int_type = ctxt.get_type(gccjit.TypeKind.INT)
+        float_type = ctxt.get_type(gccjit.TypeKind.FLOAT)
+        as_int = ctxt.new_field(int_type, b'as_int')
+        as_float = ctxt.new_field(float_type, b'as_float')
+        u = ctxt.new_union(b'u', [as_int, as_float])
+        self.assertEqual(str(u), 'union u')
+
 if __name__ == '__main__':
     unittest.main()
