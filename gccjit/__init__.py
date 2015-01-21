@@ -1,4 +1,6 @@
 #   Copyright 2014 Simon Feltman <s.feltman@gmail.com>
+#   Copyright 2015 David Malcolm <dmalcolm@redhat.com>
+#   Copyright 2015 Red Hat, Inc.
 #
 #   This is free software: you can redistribute it and/or modify it
 #   under the terms of the GNU General Public License as published by
@@ -35,5 +37,6 @@ from ._gccjit import (Context,
                       StrOption,
                       IntOption,
                       BoolOption,
+                      OutputKind,
                       TypeKind,
                       )

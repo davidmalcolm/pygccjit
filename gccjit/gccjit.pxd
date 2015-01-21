@@ -1,5 +1,5 @@
-#   Copyright 2013 David Malcolm <dmalcolm@redhat.com>
-#   Copyright 2013 Red Hat, Inc.
+#   Copyright 2013-2015 David Malcolm <dmalcolm@redhat.com>
+#   Copyright 2013-2015 Red Hat, Inc.
 #   Copyright 2014 Simon Feltman <s.feltman@gmail.com>
 #
 #   This is free software: you can redistribute it and/or modify it
@@ -111,6 +111,16 @@ cdef extern from "libgccjit.h":
     void gcc_jit_context_release (gcc_jit_context *ctxt)
 
     gcc_jit_result *gcc_jit_context_compile (gcc_jit_context *ctxt)
+
+    cdef enum gcc_jit_output_kind:
+        GCC_JIT_OUTPUT_KIND_ASSEMBLER
+        GCC_JIT_OUTPUT_KIND_OBJECT_FILE
+        GCC_JIT_OUTPUT_KIND_DYNAMIC_LIBRARY
+        GCC_JIT_OUTPUT_KIND_EXECUTABLE
+
+    void gcc_jit_context_compile_to_file (gcc_jit_context *ctxt,
+                                          gcc_jit_output_kind output_kind,
+                                          char *output_path)
 
     void gcc_jit_context_dump_to_file (gcc_jit_context *ctxt,
                                        char *path,

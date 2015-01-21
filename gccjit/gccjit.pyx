@@ -62,6 +62,10 @@ cdef class Context:
         r._set_c_ptr(c_result)
         return r
 
+    def compile_to_file(self, kind, path):
+        """compile_to_file(self, OutputKind:kind, path) -> None"""
+        c_api.gcc_jit_context_compile_to_file(self._c_ctxt, kind, path)
+
     def dump_to_file(self, path, update_locations):
         c_api.gcc_jit_context_dump_to_file(self._c_ctxt, path, update_locations)
 
@@ -769,6 +773,11 @@ cdef class BoolOption:
     SELFCHECK_GC = c_api.GCC_JIT_BOOL_OPTION_SELFCHECK_GC
     KEEP_INTERMEDIATES = c_api.GCC_JIT_BOOL_OPTION_KEEP_INTERMEDIATES
 
+cdef class OutputKind:
+    ASSEMBLER = c_api.GCC_JIT_OUTPUT_KIND_ASSEMBLER
+    OBJECT_FILE = c_api.GCC_JIT_OUTPUT_KIND_OBJECT_FILE
+    DYNAMIC_LIBRARY = c_api.GCC_JIT_OUTPUT_KIND_DYNAMIC_LIBRARY
+    EXECUTABLE = c_api.GCC_JIT_OUTPUT_KIND_EXECUTABLE
 
 cdef class TypeKind:
     VOID = c_api.GCC_JIT_TYPE_VOID
