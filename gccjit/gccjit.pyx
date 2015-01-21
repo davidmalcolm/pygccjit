@@ -83,10 +83,11 @@ cdef class Context:
         loc._set_c_location(c_loc)
         return loc
 
-    def new_global(self, Type type_, name, Location loc=None):
-        """new_global(self, type_:Type, name:str, loc:Location=None) -> LValue"""
+    def new_global(self, kind, Type type_, name, Location loc=None):
+        """new_global(self, kind:GlobalKind, type_:Type, name:str, loc:Location=None) -> LValue"""
         c_lvalue = c_api.gcc_jit_context_new_global(self._c_ctxt,
                                                     get_c_location(loc),
+                                                    kind,
                                                     type_._get_c_type(),
                                                     name)
         return LValue_from_c(c_lvalue)
@@ -800,3 +801,8 @@ cdef class TypeKind:
     CONST_CHAR_PTR = c_api.GCC_JIT_TYPE_CONST_CHAR_PTR
     SIZE_T = c_api.GCC_JIT_TYPE_SIZE_T
     FILE_PTR = c_api.GCC_JIT_TYPE_FILE_PTR
+
+cdef class GlobalKind:
+    EXPORTED = c_api.GCC_JIT_GLOBAL_EXPORTED
+    INTERNAL = c_api.GCC_JIT_GLOBAL_INTERNAL
+    IMPORTED = c_api.GCC_JIT_GLOBAL_IMPORTED

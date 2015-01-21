@@ -252,9 +252,14 @@ cdef extern from "libgccjit.h":
     #
     # lvalues, rvalues and expressions.
     #
+    cdef enum gcc_jit_global_kind:
+        GCC_JIT_GLOBAL_EXPORTED,
+        GCC_JIT_GLOBAL_INTERNAL,
+        GCC_JIT_GLOBAL_IMPORTED
 
     gcc_jit_lvalue *gcc_jit_context_new_global (gcc_jit_context *ctxt,
                                                 gcc_jit_location *loc,
+                                                gcc_jit_global_kind kind,
                                                 gcc_jit_type *type,
                                                 char *name)
 

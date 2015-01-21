@@ -39,4 +39,5 @@ from ._gccjit import (Context,
                       BoolOption,
                       OutputKind,
                       TypeKind,
+                      GlobalKind,
                       )
