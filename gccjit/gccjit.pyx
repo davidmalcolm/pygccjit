@@ -1,5 +1,5 @@
-#   Copyright 2013 David Malcolm <dmalcolm@redhat.com>
-#   Copyright 2013 Red Hat, Inc.
+#   Copyright 2013-2015 David Malcolm <dmalcolm@redhat.com>
+#   Copyright 2013-2015 Red Hat, Inc.
 #   Copyright 2014 Simon Feltman <s.feltman@gmail.com>
 #
 #   This is free software: you can redistribute it and/or modify it
@@ -606,10 +606,15 @@ cdef class Function(Object):
                                                     name)
         return LValue_from_c(c_lvalue)
 
-    def new_block(self, name):
+    def new_block(self, name=None):
         """new_block(self, name:str) -> Block"""
+        cdef char *c_name
+        if name is None:
+            c_name = NULL
+        else:
+            c_name = name
         c_block = c_api.gcc_jit_function_new_block(self._get_c_function(),
-                                                   name)
+                                                   c_name)
         if c_block == NULL:
             raise Exception("foo")
         block = Block()
