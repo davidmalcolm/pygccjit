@@ -62,28 +62,28 @@ class Compiler:
         self.func_getchar = (
             self.ctxt.new_function(gccjit.FunctionKind.IMPORTED,
                                    self.int_type,
-                                   "getchar", []))
+                                   b"getchar", []))
         self.func_putchar = (
             self.ctxt.new_function(gccjit.FunctionKind.IMPORTED,
                                    self.void_type,
-                                   "putchar",
+                                   b"putchar",
                                    [self.ctxt.new_param(self.int_type,
-                                                        "c")]))
+                                                        b"c")]))
         self.func, argv, argv = gccjit.make_main(self.ctxt)
-        self.curblock = self.func.new_block("initial")
+        self.curblock = self.func.new_block(b"initial")
         self.int_zero = self.ctxt.zero(self.int_type)
         self.int_one = self.ctxt.one(self.int_type)
         self.byte_zero = self.ctxt.zero(self.byte_type)
         self.byte_one = self.ctxt.one(self.byte_type)
         self.data_cells = self.ctxt.new_global(gccjit.GlobalKind.INTERNAL,
                                                self.array_type,
-                                               "data_cells")
+                                               b"data_cells")
         self.idx = self.func.new_local(self.int_type,
-                                       "idx")
+                                       b"idx")
 
         self.open_parens = []
 
-        self.curblock.add_comment("idx = 0;")
+        self.curblock.add_comment(b"idx = 0;")
         self.curblock.add_assignment(self.idx,
                                      self.int_zero)
 
@@ -118,25 +118,25 @@ class Compiler:
             self.curblock.add_eval (call, loc)
 
         if ch == '>':
-            self.curblock.add_comment("'>': idx += 1;", loc)
+            self.curblock.add_comment(b"'>': idx += 1;", loc)
             self.curblock.add_assignment_op(self.idx,
                                             gccjit.BinaryOp.PLUS,
                                             self.int_one,
                                             loc)
         elif ch == '<':
-            self.curblock.add_comment("'<': idx -= 1;", loc)
+            self.curblock.add_comment(b"'<': idx -= 1;", loc)
             self.curblock.add_assignment_op(self.idx,
                                             gccjit.BinaryOp.MINUS,
                                             self.int_one,
                                             loc)
         elif ch == '+':
-            self.curblock.add_comment("'+': data[idx] += 1;", loc)
+            self.curblock.add_comment(b"'+': data[idx] += 1;", loc)
             self.curblock.add_assignment_op(self.get_current_data (loc),
                                             gccjit.BinaryOp.PLUS,
                                             self.byte_one,
                                             loc)
         elif ch == '-':
-            self.curblock.add_comment("'-': data[idx] -= 1;", loc)
+            self.curblock.add_comment(b"'-': data[idx] -= 1;", loc)
             self.curblock.add_assignment_op(self.get_current_data(loc),
                                             gccjit.BinaryOp.MINUS,
                                             self.byte_one,
@@ -148,12 +148,12 @@ class Compiler:
             call = self.ctxt.new_call(self.func_putchar,
                                       [arg],
                                       loc)
-            self.curblock.add_comment("'.': putchar ((int)data[idx]);",
+            self.curblock.add_comment(b"'.': putchar ((int)data[idx]);",
                                       loc)
             self.curblock.add_eval(call, loc)
         elif ch == ',':
             call = self.ctxt.new_call(self.func_getchar, [], loc)
-            self.curblock.add_comment("',': data[idx] = (unsigned char)getchar ();",
+            self.curblock.add_comment(b"',': data[idx] = (unsigned char)getchar ();",
                                       loc)
             self.curblock.add_assignment(self.get_current_data(loc),
                                          self.ctxt.new_cast(call,
@@ -167,7 +167,7 @@ class Compiler:
 
             self.curblock.end_with_jump(loop_test, loc)
 
-            loop_test.add_comment("'['", loc)
+            loop_test.add_comment(b"'['", loc)
             loop_test.end_with_conditional(self.current_data_is_zero(loc),
                                            on_zero,
                                            on_non_zero,
@@ -175,7 +175,7 @@ class Compiler:
             self.open_parens.append(Paren(loop_test, on_non_zero, on_zero))
             self.curblock = on_non_zero;
         elif ch == ']':
-            self.curblock.add_comment("']'", loc)
+            self.curblock.add_comment(b"']'", loc)
             if not self.open_parens:
                 raise CompileError(self, "mismatching parens")
             paren = self.open_parens.pop()

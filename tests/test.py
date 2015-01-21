@@ -123,10 +123,10 @@ class JitTests(unittest.TestCase):
                                                    int_type])
         self.assertEqual(str(fn_ptr_type),
                          'void (*) (int, int, int)')
-        fn_ptr = ctxt.new_param(fn_ptr_type, "fn")
-        a = ctxt.new_param(int_type, "a")
-        b = ctxt.new_param(int_type, "b")
-        c = ctxt.new_param(int_type, "c")
+        fn_ptr = ctxt.new_param(fn_ptr_type, b"fn")
+        a = ctxt.new_param(int_type, b"a")
+        b = ctxt.new_param(int_type, b"b")
+        c = ctxt.new_param(int_type, b"c")
         call = ctxt.new_call_through_ptr(fn_ptr, [a, b, c])
         self.assertEqual(str(call),
                          'fn (a, b, c)')
@@ -143,17 +143,17 @@ class JitTests(unittest.TestCase):
     def test_bf(self):
         from examples import bf
         c = bf.Compiler()
-        c.compile_into_ctxt('examples/emit-alphabet.bf')
-        c.compile_to_file('emit-alphabet.exe')
+        c.compile_into_ctxt(b'examples/emit-alphabet.bf')
+        c.compile_to_file(b'emit-alphabet.exe')
 
 class ErrorTests(unittest.TestCase):
     def test_get_type_error(self):
         ctxt = gccjit.Context()
         with self.assertRaises(gccjit.Error) as cm:
             ctxt.get_type(-1)
-        self.assertEquals(cm.exception.msg,
-                          ('gcc_jit_context_get_type:'
-                           ' unrecognized value for enum gcc_jit_types: -1'))
+        self.assertEqual(cm.exception.msg,
+                         (b'gcc_jit_context_get_type:'
+                          b' unrecognized value for enum gcc_jit_types: -1'))
 
     def test_new_function_error(self):
         ctxt = gccjit.Context()
@@ -161,25 +161,25 @@ class ErrorTests(unittest.TestCase):
         with self.assertRaises(gccjit.Error) as cm:
             ctxt.new_function(gccjit.FunctionKind.IMPORTED,
                               int_type,
-                              "contains a space",
+                              b"contains a space",
                               [])
-        self.assertEquals(cm.exception.msg,
-           ('gcc_jit_context_new_function:'
-            ' name "contains a space" contains invalid character:'
-            " ' '"))
+        self.assertEqual(cm.exception.msg,
+           (b'gcc_jit_context_new_function:'
+            b' name "contains a space" contains invalid character:'
+            b" ' '"))
 
     def test_new_block_error(self):
         ctxt = gccjit.Context()
         int_type = ctxt.get_type(gccjit.TypeKind.INT)
         func = ctxt.new_function(gccjit.FunctionKind.IMPORTED,
                           int_type,
-                          "foo",
+                          b"foo",
                           [])
         with self.assertRaises(gccjit.Error) as cm:
             func.new_block()
-        self.assertEquals(cm.exception.msg,
-                          ('gcc_jit_function_new_block:'
-                           ' cannot add block to an imported function'))
+        self.assertEqual(cm.exception.msg,
+                         (b'gcc_jit_function_new_block:'
+                          b' cannot add block to an imported function'))
 
 if __name__ == '__main__':
     unittest.main()

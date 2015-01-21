@@ -54,12 +54,12 @@ def make_main(ctxt):
     Return (func, param_argc, param_argv)
     """
     int_type = ctxt.get_type(TypeKind.INT)
-    param_argc = ctxt.new_param(int_type, "argc")
+    param_argc = ctxt.new_param(int_type, b"argc")
     char_ptr_ptr_type = (
         ctxt.get_type(TypeKind.CHAR).get_pointer().get_pointer())
-    param_argv = ctxt.new_param(char_ptr_ptr_type, "argv")
+    param_argv = ctxt.new_param(char_ptr_ptr_type, b"argv")
     func_main = ctxt.new_function(FunctionKind.EXPORTED,
                                   int_type,
-                                  "main",
+                                  b"main",
                                   [param_argc, param_argv])
     return (func_main, param_argc, param_argv)
