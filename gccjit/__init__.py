@@ -41,3 +41,24 @@ from ._gccjit import (Context,
                       TypeKind,
                       GlobalKind,
                       )
+
+def make_main(ctxt):
+    """
+    Make "main" function:
+      int
+      main (int argc, char **argv)
+      {
+      ...
+      }
+    Return (func, param_argc, param_argv)
+    """
+    int_type = ctxt.get_type(TypeKind.INT)
+    param_argc = ctxt.new_param(int_type, "argc")
+    char_ptr_ptr_type = (
+        ctxt.get_type(TypeKind.CHAR).get_pointer().get_pointer())
+    param_argv = ctxt.new_param(char_ptr_ptr_type, "argv")
+    func_main = ctxt.new_function(FunctionKind.EXPORTED,
+                                  int_type,
+                                  "main",
+                                  [param_argc, param_argv])
+    return (func_main, param_argc, param_argv)

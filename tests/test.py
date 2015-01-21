@@ -1,5 +1,5 @@
-#   Copyright 2013 David Malcolm <dmalcolm@redhat.com>
-#   Copyright 2013 Red Hat, Inc.
+#   Copyright 2013-2015 David Malcolm <dmalcolm@redhat.com>
+#   Copyright 2013-2015 Red Hat, Inc.
 #
 #   This is free software: you can redistribute it and/or modify it
 #   under the terms of the GNU General Public License as published by
@@ -139,6 +139,12 @@ class JitTests(unittest.TestCase):
         as_float = ctxt.new_field(float_type, b'as_float')
         u = ctxt.new_union(b'u', [as_int, as_float])
         self.assertEqual(str(u), 'union u')
+
+    def test_bf(self):
+        from examples import bf
+        c = bf.Compiler()
+        c.compile_into_ctxt('examples/emit-alphabet.bf')
+        c.compile_to_file('emit-alphabet.exe')
 
 if __name__ == '__main__':
     unittest.main()
