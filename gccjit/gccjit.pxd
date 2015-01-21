@@ -298,7 +298,8 @@ cdef extern from "libgccjit.h":
     cdef enum gcc_jit_unary_op:
         GCC_JIT_UNARY_OP_MINUS,
         GCC_JIT_UNARY_OP_BITWISE_NEGATE,
-        GCC_JIT_UNARY_OP_LOGICAL_NEGATE
+        GCC_JIT_UNARY_OP_LOGICAL_NEGATE,
+        GCC_JIT_UNARY_OP_ABS
 
     gcc_jit_rvalue *gcc_jit_context_new_unary_op (gcc_jit_context *ctxt,
                       gcc_jit_location *loc,
