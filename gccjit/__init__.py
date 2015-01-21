@@ -40,6 +40,7 @@ from ._gccjit import (Context,
                       OutputKind,
                       TypeKind,
                       GlobalKind,
+                      Error,
                       )
 
 def make_main(ctxt):

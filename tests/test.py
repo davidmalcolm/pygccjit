@@ -75,7 +75,7 @@ class JitTests(unittest.TestCase):
         args = [ctxt.new_cast(buffer.get_address(), char_p),
                 ctxt.new_rvalue_from_int(size_type, 1024),
                 ctxt.new_string_literal(b'hello %s\n'),
-                param_name.as_rvalue()]
+                param_name]
 
         block = func.new_block(b'entry')
         call = ctxt.new_call(snprintf, args)
@@ -145,6 +145,41 @@ class JitTests(unittest.TestCase):
         c = bf.Compiler()
         c.compile_into_ctxt('examples/emit-alphabet.bf')
         c.compile_to_file('emit-alphabet.exe')
+
+class ErrorTests(unittest.TestCase):
+    def test_get_type_error(self):
+        ctxt = gccjit.Context()
+        with self.assertRaises(gccjit.Error) as cm:
+            ctxt.get_type(-1)
+        self.assertEquals(cm.exception.msg,
+                          ('gcc_jit_context_get_type:'
+                           ' unrecognized value for enum gcc_jit_types: -1'))
+
+    def test_new_function_error(self):
+        ctxt = gccjit.Context()
+        int_type = ctxt.get_type(gccjit.TypeKind.INT)
+        with self.assertRaises(gccjit.Error) as cm:
+            ctxt.new_function(gccjit.FunctionKind.IMPORTED,
+                              int_type,
+                              "contains a space",
+                              [])
+        self.assertEquals(cm.exception.msg,
+           ('gcc_jit_context_new_function:'
+            ' name "contains a space" contains invalid character:'
+            " ' '"))
+
+    def test_new_block_error(self):
+        ctxt = gccjit.Context()
+        int_type = ctxt.get_type(gccjit.TypeKind.INT)
+        func = ctxt.new_function(gccjit.FunctionKind.IMPORTED,
+                          int_type,
+                          "foo",
+                          [])
+        with self.assertRaises(gccjit.Error) as cm:
+            func.new_block()
+        self.assertEquals(cm.exception.msg,
+                          ('gcc_jit_function_new_block:'
+                           ' cannot add block to an imported function'))
 
 if __name__ == '__main__':
     unittest.main()

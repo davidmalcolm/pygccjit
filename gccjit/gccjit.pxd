@@ -127,6 +127,7 @@ cdef extern from "libgccjit.h":
                                        int update_locations)
 
     char *gcc_jit_context_get_first_error (gcc_jit_context *ctxt)
+    char *gcc_jit_context_get_last_error (gcc_jit_context *ctxt)
 
 
     void *gcc_jit_result_get_code (gcc_jit_result *result, char *funcname)
