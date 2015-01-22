@@ -89,6 +89,15 @@ cdef class Context:
     def dump_reproducer_to_file(self, path):
         c_api.gcc_jit_context_dump_reproducer_to_file(self._c_ctxt, path)
 
+    def set_logfile(self, f):
+        cdef c_api.FILE *c_fileptr = c_api.fdopen(f.fileno(), "w")
+        c_api.gcc_jit_context_set_logfile(self._c_ctxt,
+                                          c_fileptr,
+                                          0,
+                                          0)
+        # FIXME: no good way to clean this up, beyond a flag
+        # for the context to take ownership of the FILE *.
+
     def new_location(self, filename, line, column):
         """new_location(self, filename:str, line:int, column:int) -> Location"""
         cdef c_api.gcc_jit_location *c_loc

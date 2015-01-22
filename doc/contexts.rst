@@ -357,6 +357,34 @@ Compilation contexts
        assigned to a unique variable within the generated C source, and not
        all are necessarily then used).
 
+    .. py:method:: def set_logfile(f):
+
+       To help with debugging; enable ongoing logging of the context's
+       activity to the given file object.
+
+       For example, the following will enable logging to stderr::
+
+         ctxt.set_logfile(sys.stderr)
+
+       Examples of information logged include:
+
+         * API calls
+
+         * the various steps involved within compilation
+
+         * activity on any :py:class:`gccjit.Result` instances created by
+           the context
+
+         * activity within any child contexts
+
+       The precise format and kinds of information logged is subject
+       to change.
+
+       Unfortunately, doing so creates a leak of an underlying
+       :c:type:`FILE *` object.
+
+       There may a performance cost for logging.
+
 String options
 --------------
 .. py:class:: gccjit.StrOption

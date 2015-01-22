@@ -161,6 +161,18 @@ class JitTests(unittest.TestCase):
         finally:
             os.unlink(f.name)
 
+    def test_set_logfile(self):
+        from examples.sum_of_squares import populate_ctxt
+        ctxt = gccjit.Context()
+        with tempfile.NamedTemporaryFile(suffix=".txt") as f:
+            ctxt.set_logfile(f)
+            populate_ctxt(ctxt)
+            ctxt.compile()
+            with open(f.name) as f:
+                logtxt = f.read()
+                self.assertIn('JIT: ', logtxt)
+                self.assertIn('entering: gcc_jit_context_get_type', logtxt)
+
 class ErrorTests(unittest.TestCase):
     def test_get_type_error(self):
         ctxt = gccjit.Context()

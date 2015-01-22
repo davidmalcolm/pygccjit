@@ -16,6 +16,8 @@
 #   along with this program.  If not, see
 #   <http://www.gnu.org/licenses/>.
 
+from libc.stdio cimport *
+
 cdef extern from "libgccjit.h":
 
     #
@@ -437,3 +439,8 @@ cdef extern from "libgccjit.h":
 
     void gcc_jit_context_dump_reproducer_to_file (gcc_jit_context *ctxt,
                                                   const char *path)
+
+    void gcc_jit_context_set_logfile (gcc_jit_context *ctxt,
+                                      FILE *logfile,
+                                      int flags,
+                                      int verbosity)
