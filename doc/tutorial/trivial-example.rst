@@ -204,6 +204,6 @@ Full example
 
 Here's what the above looks like as a complete program:
 
-   .. literalinclude:: ../examples/square.py
+   .. literalinclude:: ../../examples/square.py
     :lines: 27-
     :language: python

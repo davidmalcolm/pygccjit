@@ -1,5 +1,5 @@
-.. Copyright 2014 David Malcolm <dmalcolm@redhat.com>
-   Copyright 2014 Red Hat, Inc.
+.. Copyright 2015 David Malcolm <dmalcolm@redhat.com>
+   Copyright 2015 Red Hat, Inc.
 
    This is free software: you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by
@@ -15,33 +15,15 @@
    along with this program.  If not, see
    <http://www.gnu.org/licenses/>.
 
-Python bindings for libgccjit
-=============================
-
-This document describes the
-`Python bindings <https://github.com/davidmalcolm/pygccjit>`_
-to
-`libgccjit <http://gcc.gnu.org/wiki/JIT>`_.
-
-The bindings support both CPython 2 and CPython 3 (using Cython).
-
-Note that both libgccjit and the bindings are of "Alpha" quality;
-the APIs are not yet set in stone, and they shouldn't be used in
-production yet.
-
-Contents:
+Topic Reference
+===============
 
 .. toctree::
    :maxdepth: 2
 
-   tutorial/index.rst
-   topics/index.rst
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-
+   contexts.rst
+   types.rst
+   expressions.rst
+   functions.rst
+   locations.rst
+   compilation.rst

@@ -52,7 +52,7 @@ giving:
 
 Here's what the final control flow graph will look like:
 
-    .. figure:: sum-of-squares.png
+    .. figure:: ../sum-of-squares.png
       :alt: image of a control flow graph
 
 As before, we import the libgccjit Python bindings and make a
@@ -271,7 +271,7 @@ or use a viewer (my preferred one is xdot.py; see
 https://github.com/jrfonseca/xdot.py; on Fedora you can
 install it with `yum install python-xdot`):
 
-    .. figure:: sum-of-squares.png
+    .. figure:: ../sum-of-squares.png
       :alt: image of a control flow graph
 
 Full example
@@ -279,6 +279,6 @@ Full example
 
 Here's what the above looks like as a complete program:
 
-   .. literalinclude:: ../examples/sum_of_squares.py
+   .. literalinclude:: ../../examples/sum_of_squares.py
     :lines: 34-
     :language: python

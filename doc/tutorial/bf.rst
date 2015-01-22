@@ -54,7 +54,7 @@ be trivial to have it run them JIT-compiled in-process).
 
 Here's what a simple ``.bf`` script looks like:
 
-   .. literalinclude:: ../examples/emit-alphabet.bf
+   .. literalinclude:: ../../examples/emit-alphabet.bf
     :lines: 1-
 
 .. note::
@@ -74,7 +74,7 @@ Converting a brainf script to libgccjit IR
 
 We write simple code to populate a :py:class:`gccjit.Context`.
 
-   .. literalinclude:: ../examples/bf.py
+   .. literalinclude:: ../../examples/bf.py
     :start-after: import gccjit
     :end-before: def compile_to_file(self, output_path):
     :language: python
@@ -94,7 +94,7 @@ directly to an executable, using :py:meth:`gccjit.Context.compile_to_file`:
 Here's the top-level of the compiler, which is what actually calls into
 :c:func:`gcc_jit_context_compile_to_file`:
 
- .. literalinclude:: ../examples/bf.py
+ .. literalinclude:: ../../examples/bf.py
     :start-after: # Entrypoint
     :language: python
 
@@ -105,7 +105,7 @@ as in the previous examples.
 To create an executable, we need to export a ``main`` function.  A helper
 function for doing so is provided by the JIT API:
 
- .. literalinclude:: ../gccjit/__init__.py
+ .. literalinclude:: ../../gccjit/__init__.py
     :start-after: # Make it easy to make a "main" function:
     :language: python
 
