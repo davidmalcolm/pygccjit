@@ -1,5 +1,5 @@
-.. Copyright 2014 David Malcolm <dmalcolm@redhat.com>
-   Copyright 2014 Red Hat, Inc.
+.. Copyright 2014-2015 David Malcolm <dmalcolm@redhat.com>
+   Copyright 2014-2015 Red Hat, Inc.
 
    This is free software: you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by
@@ -23,41 +23,10 @@ Compilation contexts
    The top-level of the API is the `gccjit.Context` class.
 
    A `gccjit.Context` instance encapsulates the state of a compilation.
-   It goes through two states:
 
-      * "initial", during which you can set up options on it, and add
-        types, functions and code, using the API below.
-        Invoking `compile` on it transitions it to the
-        "after compilation" state.
-
-      * "after compilation"
-
-    .. py:method:: set_str_option(opt, val)
-
-       Set a string option of the context; see :py:class:`gccjit.StrOption`
-       for notes on the options and their meanings.
-
-       :param opt: Which option to set
-       :type opt: :py:class:`gccjit.StrOption`
-       :param str val: The new value
-
-    .. py:method:: set_bool_option(opt, val)
-
-       Set a boolean option of the context; see :py:class:`gccjit.BoolOption`
-       for notes on the options and their meanings.
-
-       :param opt: Which option to set
-       :type opt: :py:class:`gccjit.BoolOption`
-       :param str val: The new value
-
-    .. py:method:: set_int_option(opt, val)
-
-       Set an integer option of the context; see :py:class:`gccjit.IntOption`
-       for notes on the options and their meanings.
-
-       :param opt: Which option to set
-       :type opt: :py:class:`gccjit.IntOption`
-       :param str val: The new value
+   You can set up options on it, and add types, functions and code.
+   Invoking :py:meth:`gccjit.Context.compile` on it gives you a
+   :py:class:`gccjit.Result`.
 
     .. py:method:: get_type(type_enum)
 
@@ -381,8 +350,21 @@ Compilation contexts
 
        There may a performance cost for logging.
 
+Options
+-------
+
 String options
---------------
+**************
+
+.. py:method:: gccjit.Context.set_str_option(self, opt, val)
+
+       Set a string option of the context; see :py:class:`gccjit.StrOption`
+       for notes on the options and their meanings.
+
+       :param opt: Which option to set
+       :type opt: :py:class:`gccjit.StrOption`
+       :param str val: The new value
+
 .. py:class:: gccjit.StrOption
 
     .. py:data:: PROGNAME
@@ -391,7 +373,17 @@ String options
        messages to stderr.  If `None`, or default, "libgccjit.so" is used.
 
 Boolean options
----------------
+***************
+
+.. py:method:: gccjit.Context.set_bool_option(self, opt, val)
+
+       Set a boolean option of the context; see :py:class:`gccjit.BoolOption`
+       for notes on the options and their meanings.
+
+       :param opt: Which option to set
+       :type opt: :py:class:`gccjit.BoolOption`
+       :param str val: The new value
+
 .. py:class:: gccjit.BoolOption
 
   .. py:data:: DEBUGINFO
@@ -509,7 +501,17 @@ Boolean options
      written to the filesystem, and will display their location on stderr.
 
 Integer options
----------------
+***************
+
+.. py:method:: gccjit.Context.set_int_option(seld, opt, val)
+
+       Set an integer option of the context; see :py:class:`gccjit.IntOption`
+       for notes on the options and their meanings.
+
+       :param opt: Which option to set
+       :type opt: :py:class:`gccjit.IntOption`
+       :param str val: The new value
+
 .. py:class:: gccjit.IntOption
 
   .. py:data:: OPTIMIZATION_LEVEL
