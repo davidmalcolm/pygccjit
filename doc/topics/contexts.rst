@@ -304,7 +304,10 @@ Compilation contexts
 
          block.add_eval (ctxt.new_call_through_ptr(fn_ptr, [a, b, c]))
 
-    .. py:method:: dump_reproducer_to_file(path)
+Debugging
+---------
+
+.. py:method:: gccjit.Context.dump_reproducer_to_file(self, path)
 
        Write C source code into `path` that can be compiled into a
        self-contained executable (i.e. with libgccjit as the only
@@ -322,7 +325,7 @@ Compilation contexts
        assigned to a unique variable within the generated C source, and not
        all are necessarily then used).
 
-    .. py:method:: set_logfile(f)
+.. py:method:: gccjit.Context.set_logfile(self, f)
 
        To help with debugging; enable ongoing logging of the context's
        activity to the given file object.
