@@ -415,6 +415,9 @@ cdef class Result:
     def __cinit__(self):
         self._c_result = NULL
 
+    def __dealloc__(self):
+        c_api.gcc_jit_result_release(self._c_result)
+
     cdef _set_c_ptr(self, c_api.gcc_jit_result* c_result):
         self._c_result = c_result
 
