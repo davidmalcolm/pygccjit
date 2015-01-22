@@ -86,6 +86,9 @@ cdef class Context:
            return err
         return None
 
+    def dump_reproducer_to_file(self, path):
+        c_api.gcc_jit_context_dump_reproducer_to_file(self._c_ctxt, path)
+
     def new_location(self, filename, line, column):
         """new_location(self, filename:str, line:int, column:int) -> Location"""
         cdef c_api.gcc_jit_location *c_loc

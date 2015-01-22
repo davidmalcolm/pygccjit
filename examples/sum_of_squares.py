@@ -35,18 +35,7 @@ import ctypes
 
 import gccjit
 
-def create_fn():
-    # Create a compilation context:
-    ctxt = gccjit.Context()
-
-    if 0:
-        ctxt.set_bool_option(gccjit.BoolOption.DUMP_INITIAL_TREE, True)
-        ctxt.set_bool_option(gccjit.BoolOption.DUMP_INITIAL_GIMPLE, True)
-        ctxt.set_bool_option(gccjit.BoolOption.DUMP_EVERYTHING, True)
-        ctxt.set_bool_option(gccjit.BoolOption.KEEP_INTERMEDIATES, True)
-    if 0:
-        ctxt.set_int_option(gccjit.IntOption.OPTIMIZATION_LEVEL, 3)
-
+def populate_ctxt(ctxt):
     the_type = ctxt.get_type(gccjit.TypeKind.INT)
     return_type = the_type
     param_n = ctxt.new_param(the_type, b"n")
@@ -105,6 +94,20 @@ def create_fn():
 
     # return sum
     after_loop_block.end_with_return(local_sum)
+
+def create_fn():
+    # Create a compilation context:
+    ctxt = gccjit.Context()
+
+    if 0:
+        ctxt.set_bool_option(gccjit.BoolOption.DUMP_INITIAL_TREE, True)
+        ctxt.set_bool_option(gccjit.BoolOption.DUMP_INITIAL_GIMPLE, True)
+        ctxt.set_bool_option(gccjit.BoolOption.DUMP_EVERYTHING, True)
+        ctxt.set_bool_option(gccjit.BoolOption.KEEP_INTERMEDIATES, True)
+    if 0:
+        ctxt.set_int_option(gccjit.IntOption.OPTIMIZATION_LEVEL, 3)
+
+    populate_ctxt(ctxt)
 
     jit_result = ctxt.compile()
     return jit_result

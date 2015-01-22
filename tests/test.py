@@ -15,8 +15,10 @@
 #   along with this program.  If not, see
 #   <http://www.gnu.org/licenses/>.
 
-import unittest
 import ctypes
+import os
+import tempfile
+import unittest
 
 import gccjit
 
@@ -145,6 +147,19 @@ class JitTests(unittest.TestCase):
         c = bf.Compiler()
         c.compile_into_ctxt(b'examples/emit-alphabet.bf')
         c.compile_to_file(b'emit-alphabet.exe')
+
+    def test_dump_reproducer(self):
+        from examples.sum_of_squares import populate_ctxt
+        ctxt = gccjit.Context()
+        populate_ctxt(ctxt)
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".c") as f:
+            ctxt.dump_reproducer_to_file(f.name.encode('utf-8'))
+        try:
+            with open(f.name) as f:
+                gensrc = f.read()
+                self.assertIn('#include <libgccjit.h>', gensrc)
+        finally:
+            os.unlink(f.name)
 
 class ErrorTests(unittest.TestCase):
     def test_get_type_error(self):

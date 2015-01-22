@@ -339,6 +339,24 @@ Compilation contexts
 
          block.add_eval (ctxt.new_call_through_ptr(fn_ptr, [a, b, c]))
 
+    .. py:method:: dump_reproducer_to_file(path)
+
+       Write C source code into `path` that can be compiled into a
+       self-contained executable (i.e. with libgccjit as the only
+       dependency).
+       The generated code will attempt to replay the API calls that have
+       been made into the given context, at the C level, eliminating any
+       dependency on Python or on client code or data.
+
+       This may be useful when debugging the library or client code, for
+       reducing a complicated recipe for reproducing a bug into a simpler
+       form.
+
+       Typically you need to supply :option:`-Wno-unused-variable` when
+       compiling the generated file (since the result of each API call is
+       assigned to a unique variable within the generated C source, and not
+       all are necessarily then used).
+
 String options
 --------------
 .. py:class:: gccjit.StrOption

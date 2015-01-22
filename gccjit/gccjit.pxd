@@ -435,4 +435,5 @@ cdef extern from "libgccjit.h":
 
     gcc_jit_context *gcc_jit_context_new_child_context (gcc_jit_context *parent_ctxt)
 
-
+    void gcc_jit_context_dump_reproducer_to_file (gcc_jit_context *ctxt,
+                                                  const char *path)
