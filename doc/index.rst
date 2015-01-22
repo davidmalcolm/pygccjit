@@ -31,7 +31,7 @@ Contents:
    expressions.rst
    functions.rst
    locations.rst
-   results.rst
+   compilation.rst
 
 This document describes the
 `Python bindings <https://github.com/davidmalcolm/pygccjit>`_

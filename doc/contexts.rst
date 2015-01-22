@@ -74,12 +74,6 @@ Compilation contexts
 
           int_type = ctxt.get_int_type(4, is_signed=True)
 
-    .. py:method:: compile()
-
-       :rtype: :py:class:`gccjit.Result`
-
-    .. py:method:: compile_to_file(kind, path)
-
     .. py:method:: dump_to_file(path, update_locations)
 
     .. py:method:: get_first_error()
