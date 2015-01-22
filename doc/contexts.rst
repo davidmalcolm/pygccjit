@@ -357,7 +357,7 @@ Compilation contexts
        assigned to a unique variable within the generated C source, and not
        all are necessarily then used).
 
-    .. py:method:: def set_logfile(f):
+    .. py:method:: set_logfile(f)
 
        To help with debugging; enable ongoing logging of the context's
        activity to the given file object.
