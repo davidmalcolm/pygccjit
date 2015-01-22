@@ -1,5 +1,5 @@
-.. Copyright 2014 David Malcolm <dmalcolm@redhat.com>
-   Copyright 2014 Red Hat, Inc.
+.. Copyright 2014-2015 David Malcolm <dmalcolm@redhat.com>
+   Copyright 2014-2015 Red Hat, Inc.
 
    This is free software: you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by
@@ -59,6 +59,88 @@ Types can be created in several ways:
        Given type `T` get type `volatile T`.
 
        :rtype: :py:class:`gccjit.Type`
+
+Standard types
+--------------
+
+.. py:method:: gccjit.Context.get_type(self, type_enum)
+
+       Look up one of the standard types (see :py:class:`gccjit.TypeKind`)::
+
+          int_type = ctxt.get_type(gccjit.TypeKind.INT)
+
+       :param type_enum: Which type to lookup
+       :type type_enum: :py:class:`gccjit.TypeKind`
+
+.. py:class:: gccjit.TypeKind
+
+  .. py:data:: VOID
+
+     C's "void" type.
+
+  .. py:data:: VOID_PTR
+
+     C's "void \*".
+
+  .. py:data:: BOOL
+
+     C++'s bool type; also C99's "_Bool" type, aka "bool" if using
+     stdbool.h.
+
+  .. py:data:: CHAR
+  .. py:data:: SIGNED_CHAR
+  .. py:data:: UNSIGNED_CHAR
+
+     C's "char" (of some signedness) and the variants where the
+     signedness is specified.
+
+  .. py:data:: SHORT
+  .. py:data:: UNSIGNED_SHORT
+
+     C's "short" (signed) and "unsigned short".
+
+  .. py:data:: INT
+  .. py:data:: UNSIGNED_INT
+
+     C's "int" (signed) and "unsigned int"::
+
+          int_type = ctxt.get_type(gccjit.TypeKind.INT)
+
+  .. py:data:: LONG
+  .. py:data:: UNSIGNED_LONG
+
+     C's "long" (signed) and "unsigned long".
+
+  .. py:data:: LONG_LONG
+  .. py:data:: UNSIGNED_LONG_LONG
+
+     C99's "long long" (signed) and "unsigned long long".
+
+  .. py:data:: FLOAT
+  .. py:data:: DOUBLE
+  .. py:data:: LONG_DOUBLE
+
+     Floating-point types
+
+  .. py:data:: CONST_CHAR_PTR
+
+     C type: (const char \*)::
+
+       const_char_p = ctxt.get_type(gccjit.TypeKind.CONST_CHAR_PTR)
+
+  .. py:data:: SIZE_T
+
+    The C "size_t" type.
+
+  .. py:data:: FILE_PTR
+
+    C type: (FILE \*)
+
+.. py:method:: gccjit.Context.get_int_type(self, num_bytes, is_signed)
+
+       Look up an integet type of the given size::
+
+          int_type = ctxt.get_int_type(4, is_signed=True)
 
 Structures
 ----------
