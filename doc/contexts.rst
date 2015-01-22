@@ -78,6 +78,8 @@ Compilation contexts
 
        :rtype: :py:class:`gccjit.Result`
 
+    .. py:method:: compile_to_file(kind, path)
+
     .. py:method:: dump_to_file(path, update_locations)
 
     .. py:method:: get_first_error()

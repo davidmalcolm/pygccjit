@@ -25,6 +25,7 @@ Contents:
 
    trivial-example.rst
    loops.rst
+   bf.rst
    contexts.rst
    types.rst
    expressions.rst

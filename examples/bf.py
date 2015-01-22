@@ -191,7 +191,7 @@ class Compiler:
 
     def compile_into_ctxt(self, filename):
         """
-        Compile the given .bf file into a gcc_jit_context, containing a
+        Compile the given .bf file into the gccjit.Context, containing a
         single "main" function suitable for compiling into an executable.
         """
         self.filename = filename;
@@ -205,6 +205,8 @@ class Compiler:
     def compile_to_file(self, output_path):
         self.ctxt.compile_to_file(gccjit.OutputKind.EXECUTABLE,
                                   output_path)
+
+# Entrypoint
 
 def main(argv):
     srcfile = argv[1]

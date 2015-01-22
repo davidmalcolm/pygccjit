@@ -43,6 +43,8 @@ from ._gccjit import (Context,
                       Error,
                       )
 
+# Make it easy to make a "main" function:
+
 def make_main(ctxt):
     """
     Make "main" function:
