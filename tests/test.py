@@ -142,11 +142,21 @@ class JitTests(unittest.TestCase):
         u = ctxt.new_union(b'u', [as_int, as_float])
         self.assertEqual(str(u), 'union u')
 
-    def test_bf(self):
+    def test_bf_aot(self):
+        from examples import bf
+        from subprocess import Popen, PIPE
+        c = bf.Compiler()
+        c.parse_into_ctxt(b'examples/emit-alphabet.bf')
+        c.compile_to_file(b'emit-alphabet.exe')
+        p = Popen(b'./emit-alphabet.exe', stdout=PIPE)
+        out, err = p.communicate()
+        self.assertEqual(out, b'ABCDEFGHIJKLMNOPQRSTUVWXYZ')
+
+    def test_bf_jit(self):
         from examples import bf
         c = bf.Compiler()
-        c.compile_into_ctxt(b'examples/emit-alphabet.bf')
-        c.compile_to_file(b'emit-alphabet.exe')
+        c.parse_into_ctxt(b'examples/emit-alphabet.bf')
+        c.run()
 
     def test_dump_reproducer(self):
         from examples.sum_of_squares import populate_ctxt

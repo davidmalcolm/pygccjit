@@ -69,7 +69,8 @@ class Compiler:
                                    b"putchar",
                                    [self.ctxt.new_param(self.int_type,
                                                         b"c")]))
-        self.func, argv, argv = gccjit.make_main(self.ctxt)
+        self.func = self.ctxt.new_function(gccjit.FunctionKind.EXPORTED,
+                                           self.void_type, b'func', [])
         self.curblock = self.func.new_block(b"initial")
         self.int_zero = self.ctxt.zero(self.int_type)
         self.int_one = self.ctxt.one(self.int_type)
@@ -189,9 +190,9 @@ class Compiler:
             self.column += 1
 
 
-    def compile_into_ctxt(self, filename):
+    def parse_into_ctxt(self, filename):
         """
-        Compile the given .bf file into the gccjit.Context, containing a
+        Parse the given .bf file into the gccjit.Context, containing a
         single "main" function suitable for compiling into an executable.
         """
         self.filename = filename;
@@ -200,20 +201,49 @@ class Compiler:
         with open(filename) as f_in:
             for ch in f_in.read():
                 self.compile_char(ch)
-        self.curblock.end_with_return(self.int_zero)
+        self.curblock.end_with_void_return()
+
+    # Compiling to an executable
 
     def compile_to_file(self, output_path):
+        # Wrap "func" up in a "main" function
+        mainfunc, argv, argv = gccjit.make_main(self.ctxt)
+        block = mainfunc.new_block()
+        block.add_eval(self.ctxt.new_call(self.func, []))
+        block.end_with_return(self.int_zero)
         self.ctxt.compile_to_file(gccjit.OutputKind.EXECUTABLE,
                                   output_path)
+
+    # Running the generated code in-process
+
+    def run(self):
+        import ctypes
+        result = self.ctxt.compile()
+        py_func_type = ctypes.CFUNCTYPE(None)
+        py_func = py_func_type(result.get_code(b'func'))
+        py_func()
 
 # Entrypoint
 
 def main(argv):
-    srcfile = argv[1]
-    outfile = argv[2]
+    from optparse import OptionParser
+    parser = OptionParser()
+    parser.add_option("-o", "--output", dest="outputfile",
+                      help="compile to FILE", metavar="FILE")
+    (options, args) = parser.parse_args()
+    if len(args) != 1:
+        raise ValueError('No input file')
+    inputfile = args[0]
     c = Compiler()
-    c.compile_into_ctxt(srcfile)
-    c.compile_to_file(outfile)
+    c.parse_into_ctxt(inputfile)
+    if options.outputfile:
+        c.compile_to_file(options.outputfile)
+    else:
+        c.run()
 
 if __name__ == '__main__':
-    main(sys.argv)
+    try:
+        main(sys.argv)
+    except Exception, exc:
+        print(exc)
+        sys.exit(1)

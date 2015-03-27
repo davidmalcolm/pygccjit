@@ -81,44 +81,56 @@ We write simple code to populate a :py:class:`gccjit.Context`.
 
 Compiling a context to a file
 *****************************
-
-Unlike the previous examples, this time we'll compile the context
-directly to an executable, using :py:meth:`gccjit.Context.compile_to_file`:
-
-.. code-block:: python
-
-    def compile_to_file(self, output_path):
-        self.ctxt.compile_to_file(gccjit.OutputKind.EXECUTABLE,
-                                  output_path)
-
-Here's the top-level of the compiler, which is what actually calls into
-:c:func:`gcc_jit_context_compile_to_file`:
+In previous examples, we compiled and ran the generated machine code
+in-process.  We can do that:
 
  .. literalinclude:: ../../examples/bf.py
-    :start-after: # Entrypoint
+    :start-after: # Running the generated code in-process
+    :end-before: # Entrypoint
     :language: python
 
-Note how once the context is populated you could trivially instead compile
-it to memory using :py:meth:`gccjit.Context.compile` and run it in-process
-as in the previous examples.
+but this time we'll also provide a way to compile the context directly
+to an executable, using :py:meth:`gccjit.Context.compile_to_file`.
 
-To create an executable, we need to export a ``main`` function.  A helper
+To do so, we need to export a ``main`` function.  A helper
 function for doing so is provided by the JIT API:
 
  .. literalinclude:: ../../gccjit/__init__.py
     :start-after: # Make it easy to make a "main" function:
     :language: python
 
+which we can use (as ``gccjit.make_main``) to compile the function
+to an executable:
+
+ .. literalinclude:: ../../examples/bf.py
+    :start-after: # Compiling to an executable
+    :end-before: # Running the generated code in-process
+    :language: python
+
+Finally, here's the top-level of the program:
+
+ .. literalinclude:: ../../examples/bf.py
+    :start-after: # Entrypoint
+    :language: python
+
 The overall script `examples/bf.py` is thus a bf-to-machine-code compiler,
-which we can use to compile .bf files into machine code executables:
+which we can use to compile .bf files, either to run in-process,
+
+.. code-block:: console
+
+  $ PYTHONPATH=. python examples/bf.py \
+       emit-alphabet.bf
+  ABCDEFGHIJKLMNOPQRSTUVWXYZ
+
+or to compile into machine code executables:
 
 .. code-block:: console
 
   $ PYTHONPATH=. python examples/bf.py \
        emit-alphabet.bf \
-       a.out
+       -o a.out
 
-which we can run directly:
+which we can run independently:
 
 .. code-block:: console
 
