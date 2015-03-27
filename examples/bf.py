@@ -244,6 +244,6 @@ def main(argv):
 if __name__ == '__main__':
     try:
         main(sys.argv)
-    except Exception, exc:
+    except Exception as exc:
         print(exc)
         sys.exit(1)
