@@ -25,7 +25,7 @@ Programming Language :: Python :: 3
 
 setup(
     name='gccjit',
-    version='0.2',
+    version='0.3',
     author="David Malcolm",
     author_email="jit@gcc.gnu.org",
     url="https://github.com/davidmalcolm/pygccjit",
