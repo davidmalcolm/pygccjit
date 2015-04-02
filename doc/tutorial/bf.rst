@@ -151,28 +151,35 @@ have become integer constants 0x1a and 0x41):
 
 .. code-block:: console
 
-  0000000000400620 <main>:
-    400620:     80 3d 39 0a 20 00 00    cmpb   $0x0,0x200a39(%rip)        # 601060 <data
-    400627:     74 07                   je     400630 <main
-    400629:     eb fe                   jmp    400629 <main+0x9>
-    40062b:     0f 1f 44 00 00          nopl   0x0(%rax,%rax,1)
-    400630:     48 83 ec 08             sub    $0x8,%rsp
-    400634:     0f b6 05 26 0a 20 00    movzbl 0x200a26(%rip),%eax        # 601061 <data_cells+0x1>
-    40063b:     c6 05 1e 0a 20 00 1a    movb   $0x1a,0x200a1e(%rip)       # 601060 <data_cells>
-    400642:     8d 78 41                lea    0x41(%rax),%edi
-    400645:     40 88 3d 15 0a 20 00    mov    %dil,0x200a15(%rip)        # 601061 <data_cells+0x1>
-    40064c:     0f 1f 40 00             nopl   0x0(%rax)
-    400650:     40 0f b6 ff             movzbl %dil,%edi
-    400654:     e8 87 fe ff ff          callq  4004e0 <putchar@plt>
-    400659:     0f b6 05 01 0a 20 00    movzbl 0x200a01(%rip),%eax        # 601061 <data_cells+0x1>
-    400660:     80 2d f9 09 20 00 01    subb   $0x1,0x2009f9(%rip)        # 601060 <data_cells>
-    400667:     8d 78 01                lea    0x1(%rax),%edi
-    40066a:     40 88 3d f0 09 20 00    mov    %dil,0x2009f0(%rip)        # 601061 <data_cells+0x1>
-    400671:     75 dd                   jne    400650 <main+0x30>
-    400673:     31 c0                   xor    %eax,%eax
-    400675:     48 83 c4 08             add    $0x8,%rsp
-    400679:     c3                      retq
-    40067a:     66 0f 1f 44 00 00       nopw   0x0(%rax,%rax,1)
+  0000000000400620 <func>:
+    400620:       80 3d 39 0a 20 00 00    cmpb   $0x0,0x200a39(%rip)        # 601060 <data_cells>
+    400627:       74 07                   je     400630 <func+0x10>
+    400629:       eb fe                   jmp    400629 <func+0x9>
+    40062b:       0f 1f 44 00 00          nopl   0x0(%rax,%rax,1)
+    400630:       48 83 ec 08             sub    $0x8,%rsp
+    400634:       0f b6 05 26 0a 20 00    movzbl 0x200a26(%rip),%eax        # 601061 <data_cells+0x1>
+    40063b:       c6 05 1e 0a 20 00 1a    movb   $0x1a,0x200a1e(%rip)        # 601060 <data_cells>
+    400642:       8d 78 41                lea    0x41(%rax),%edi
+    400645:       40 88 3d 15 0a 20 00    mov    %dil,0x200a15(%rip)        # 601061 <data_cells+0x1>
+    40064c:       0f 1f 40 00             nopl   0x0(%rax)
+    400650:       40 0f b6 ff             movzbl %dil,%edi
+    400654:       e8 87 fe ff ff          callq  4004e0 <putchar@plt>
+    400659:       0f b6 05 01 0a 20 00    movzbl 0x200a01(%rip),%eax        # 601061 <data_cells+0x1>
+    400660:       80 2d f9 09 20 00 01    subb   $0x1,0x2009f9(%rip)        # 601060 <data_cells>
+    400667:       8d 78 01                lea    0x1(%rax),%edi
+    40066a:       40 88 3d f0 09 20 00    mov    %dil,0x2009f0(%rip)        # 601061 <data_cells+0x1>
+    400671:       75 dd                   jne    400650 <func+0x30>
+    400673:       48 83 c4 08             add    $0x8,%rsp
+    400677:       c3                      retq
+    400678:       0f 1f 84 00 00 00 00    nopl   0x0(%rax,%rax,1)
+    40067f:       00
+
+  0000000000400680 <main>:
+    400680:       48 83 ec 08             sub    $0x8,%rsp
+    400684:       e8 97 ff ff ff          callq  400620 <func>
+    400689:       31 c0                   xor    %eax,%eax
+    40068b:       48 83 c4 08             add    $0x8,%rsp
+    40068f:       c3                      retq
 
 We also set up debugging information (via
 :py:meth:`gccjit.Context.new_location` and
