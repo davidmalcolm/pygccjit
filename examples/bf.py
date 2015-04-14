@@ -193,7 +193,7 @@ class Compiler:
     def parse_into_ctxt(self, filename):
         """
         Parse the given .bf file into the gccjit.Context, containing a
-        single "main" function suitable for compiling into an executable.
+        single function "func".
         """
         self.filename = filename;
         self.line = 1
