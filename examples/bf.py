@@ -39,7 +39,7 @@ class CompileError(Exception):
                 % (self.filename, self.line, self.column, self.msg))
 
 class Compiler:
-    def __init__(self): #, filename):
+    def __init__(self):
         self.ctxt = gccjit.Context()
         if 1:
             self.ctxt.set_int_option(gccjit.IntOption.OPTIMIZATION_LEVEL,
