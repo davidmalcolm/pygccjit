@@ -21,6 +21,16 @@ import sys
 
 import gccjit
 
+import datetime
+from contextlib import contextmanager
+
+@contextmanager
+def timer(desc):
+    start = datetime.datetime.now()
+    yield
+    stop = datetime.datetime.now()
+    print('%s: %ss' % (desc, (stop - start).total_seconds()))
+
 class Paren:
     def __init__(self, b_test, b_body, b_after):
         self.b_test = b_test
@@ -218,10 +228,12 @@ class Compiler:
 
     def run(self):
         import ctypes
-        result = self.ctxt.compile()
+        with timer("compiling"):
+            result = self.ctxt.compile()
         py_func_type = ctypes.CFUNCTYPE(None)
         py_func = py_func_type(result.get_code(b'func'))
-        py_func()
+        with timer("running"):
+            py_func()
 
 # Entrypoint
 
@@ -235,11 +247,13 @@ def main(argv):
         raise ValueError('No input file')
     inputfile = args[0]
     c = Compiler()
-    c.parse_into_ctxt(inputfile)
-    if options.outputfile:
-        c.compile_to_file(options.outputfile)
-    else:
-        c.run()
+    with timer("total"):
+        with timer("parsing"):
+            c.parse_into_ctxt(inputfile)
+        if options.outputfile:
+            c.compile_to_file(options.outputfile)
+        else:
+            c.run()
 
 if __name__ == '__main__':
     try:
