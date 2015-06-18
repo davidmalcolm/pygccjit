@@ -291,7 +291,7 @@ cdef class Context:
                                                              value)
         return RValue_from_c(self._c_ctxt, c_rvalue)
 
-    def new_rvalue_from_ptr(self, Type pointer_type, long value):
+    def new_rvalue_from_ptr(self, Type pointer_type, long long value):
         c_rvalue = c_api.gcc_jit_context_new_rvalue_from_ptr(self._c_ctxt,
                                                              pointer_type._get_c_type(),
                                                              <void *>value)
