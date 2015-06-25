@@ -186,6 +186,48 @@ Functions
 
         return;
 
+   .. py:method:: end_with_switch(expr, default_block,\
+                                  cases, Location loc=None)
+
+      Terminate a block by adding evalation of an rvalue, then performing
+      a multiway branch.
+
+      This is roughly equivalent to this C code:
+
+      .. code-block:: c
+
+         switch (expr)
+           {
+           default:
+             goto default_block;
+
+           case C0.min_value ... C0.max_value:
+             goto C0.dest_block;
+
+           case C1.min_value ... C1.max_value:
+             goto C1.dest_block;
+
+           ...etc...
+
+           case C[N - 1].min_value ... C[N - 1].max_value:
+             goto C[N - 1].dest_block;
+         }
+
+      ``expr`` must be of the same integer type as all of the
+      ``min_value`` and ``max_value`` within the cases.
+
+      The ranges of the cases must not overlap (or have duplicate
+      values).
+
+      Cases are created using :py:meth:`gccjit.Context.new_case`.
+
+      Here's an example of creating a switch statement:
+
+      .. literalinclude:: ../../examples/switch.py
+       :start-after: # Quote from here in docs/topics/functions.rst
+       :end-before: # Quote up to here in docs/topics/functions.rst
+       :language: python
+
    .. py:method:: get_function()
 
       Get the :py:class:`gccjit.Function` that this block is within.

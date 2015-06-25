@@ -47,6 +47,8 @@ cdef extern from "libgccjit.h":
         pass
     ctypedef struct gcc_jit_struct:
         pass
+    ctypedef struct gcc_jit_case:
+        pass
 
     cdef enum gcc_jit_types:
         GCC_JIT_TYPE_VOID,
@@ -430,6 +432,19 @@ cdef extern from "libgccjit.h":
 
     void gcc_jit_block_end_with_void_return (gcc_jit_block *block,
                                              gcc_jit_location *loc)
+
+
+    gcc_jit_case * gcc_jit_context_new_case (gcc_jit_context *ctxt,
+                                             gcc_jit_rvalue *min_value,
+                                             gcc_jit_rvalue *max_value,
+                                             gcc_jit_block *dest_block)
+
+    void gcc_jit_block_end_with_switch (gcc_jit_block *block,
+                                        gcc_jit_location *loc,
+                                        gcc_jit_rvalue *expr,
+                                        gcc_jit_block *default_block,
+                                        int num_cases,
+                                        gcc_jit_case **cases)
 
     #
     # Nested contexts.

@@ -289,6 +289,17 @@ Compilation contexts
 
          block.add_eval (ctxt.new_call_through_ptr(fn_ptr, [a, b, c]))
 
+    .. py:method:: new_case(min_value, max_value, dest_block)
+
+       Create a new :py:class:`Case` instance for use with
+       :py:meth:`gccjit.Block.end_with_switch`.
+
+       `min_value` and `max_value` must be constants of an integer type,
+       which must match that of the expression of the switch statement.
+
+       `dest_block` must be within the same function as the switch
+       statement.
+
 Debugging
 ---------
 

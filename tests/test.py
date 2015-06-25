@@ -183,6 +183,14 @@ class JitTests(unittest.TestCase):
                 self.assertIn('JIT: ', logtxt)
                 self.assertIn('entering: gcc_jit_context_get_type', logtxt)
 
+    def test_switch(self):
+        from examples.switch import compile_test_switch, simulate_fn
+        jit_result, test_switch = compile_test_switch()
+        for i in range(-200, 200):
+            self.assertEqual(test_switch(i),
+                             simulate_fn(i))
+        del jit_result
+
 class ErrorTests(unittest.TestCase):
     def test_get_type_error(self):
         ctxt = gccjit.Context()

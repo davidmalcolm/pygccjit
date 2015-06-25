@@ -410,6 +410,14 @@ cdef class Context:
         free(c_args)
         return RValue_from_c(self._c_ctxt, c_rvalue)
 
+    def new_case(self, RValue min_value, RValue max_value, Block dest_block):
+        """new_case(self, RValue min_value, RValue max_value, Block dest_block) -> Case"""
+        c_case = c_api.gcc_jit_context_new_case(self._c_ctxt,
+                                                min_value._get_c_rvalue(),
+                                                max_value._get_c_rvalue(),
+                                                dest_block._get_c_block())
+        return Case_from_c(self._c_ctxt, c_case)
+
 cdef class Result:
     cdef c_api.gcc_jit_result* _c_result
     def __cinit__(self):
@@ -718,12 +726,49 @@ cdef class Block(Object):
         c_api.gcc_jit_block_end_with_void_return(self._get_c_block(),
                                                  get_c_location(loc))
 
+    def end_with_switch(self, RValue expr, Block default_block,
+                        cases, Location loc=None):
+        cases = list(cases)
+        cdef int num_cases = len(cases)
+        cdef c_api.gcc_jit_case **c_cases = \
+            <c_api.gcc_jit_case **>malloc(num_cases * sizeof(c_api.gcc_jit_case *))
+        if c_cases is NULL:
+            raise MemoryError()
+
+        cdef Case case
+        for i in range(num_cases):
+            case = cases[i]
+            c_cases[i] = case._get_c_case()
+
+        c_api.gcc_jit_block_end_with_switch(self._get_c_block(),
+                                            get_c_location(loc),
+                                            expr._get_c_rvalue(),
+                                            default_block._get_c_block(),
+                                            num_cases,
+                                            c_cases)
+        free(c_cases)
+
     def get_function(self):
         """get_function(self) -> Function"""
         c_function = c_api.gcc_jit_block_get_function (self._get_c_block())
         return Function_from_c(self._get_c_context(),
                                c_function)
 
+cdef class Case(Object):
+    cdef c_api.gcc_jit_case* _get_c_case(self):
+        return <c_api.gcc_jit_case*>self._c_object
+
+    cdef _set_c_case(self, c_api.gcc_jit_case* c_case):
+        self._c_object = <c_api.gcc_jit_object *>c_case
+
+cdef Case Case_from_c(c_api.gcc_jit_context *c_ctxt,
+                      c_api.gcc_jit_case *c_case):
+    if c_case == NULL:
+        raise Error(c_api.gcc_jit_context_get_last_error(c_ctxt))
+
+    py_case = Case()
+    py_case._set_c_case(c_case)
+    return py_case
 
 cdef class FunctionKind:
     EXPORTED = c_api.GCC_JIT_FUNCTION_EXPORTED
