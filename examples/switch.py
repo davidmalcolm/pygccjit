@@ -126,4 +126,7 @@ def compile_test_switch():
     return jit_result, code
 
 if __name__ == '__main__':
-    print(test_switch(10))
+    jit_result, test_switch = compile_test_switch()
+    for i in range(-200, 200):
+        print('test_switch(%i) == %i' % (i, test_switch(i)))
+    del jit_result
